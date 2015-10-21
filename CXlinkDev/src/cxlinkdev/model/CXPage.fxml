@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<FlowPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="971.0" stylesheets="@StyleSheet_CXlink.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cxlinkdev.model.CXPageController">
+   <children>
+      <ImageView fitHeight="67.0" fitWidth="201.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/PhocosLogo.png" />
+         </image>
+         <FlowPane.margin>
+            <Insets left="20.0" top="20.0" />
+         </FlowPane.margin>
+      </ImageView>
+      <Pane prefHeight="86.0" prefWidth="685.0">
+         <FlowPane.margin>
+            <Insets />
+         </FlowPane.margin></Pane>
+      <MenuButton maxHeight="60.0" maxWidth="60.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" onAction="#handleMainMenuSelect" text="Main Menu" />
+        </items>
+         <FlowPane.margin>
+            <Insets top="25.0" />
+         </FlowPane.margin>
+         <padding>
+            <Insets right="20.0" top="30.0" />
+         </padding>
+      </MenuButton>
+      <VBox prefHeight="450.0" prefWidth="210.0">
+         <FlowPane.margin>
+            <Insets left="20.0" top="30.0" />
+         </FlowPane.margin>
+         <children>
+            <Button fx:id="currentValuesButton" mnemonicParsing="false" onAction="#handleCurrentValuesSelect" prefHeight="150.0" prefWidth="210.0" text="Current Values" />
+            <Button fx:id="dataLoggerButton" mnemonicParsing="false" onAction="#handleDataLoggerSelect" prefHeight="150.0" prefWidth="210.0" text="Data Logger" />
+            <Button fx:id="newSettingsButton" layoutX="10.0" layoutY="160.0" mnemonicParsing="false" onAction="#handleNewSettingsSelect" prefHeight="150.0" prefWidth="220.0" text="New Settings" />
+         </children>
+      </VBox>
+      <StackPane fx:id="cxPageStackPane" prefHeight="150.0" prefWidth="720.0">
+         <children>
+            <BorderPane fx:id="newSettingsBorderPane" prefHeight="450.0" prefWidth="720.0">
+               <center>
+                  <GridPane id="currentValuesGrid" fx:id="currentValuesGridPane1" prefHeight="375.0" prefWidth="349.0" BorderPane.alignment="CENTER">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="239.0" minWidth="10.0" prefWidth="171.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="157.0" minWidth="10.0" prefWidth="71.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="209.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="46.0" minHeight="10.0" prefHeight="44.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <TextField fx:id="currentBatteryVoltage1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" />
+                        <TextField id="currentStageOfCharge" fx:id="currentStateOfCharge1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField id="currentChargeCurrent" fx:id="currentChargeCurrent1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField id="currentLoadCurrent" fx:id="currentLoadCurrent1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField id="currentTodaysEnergy" fx:id="currentTodaysEnergy1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField id="currentBatteryChargingState" fx:id="currentBatteryChargingState1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField id="currentLoadState" fx:id="currentLoadState1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField id="currentTemperature" fx:id="currentTemperature1" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="160.0" text="Battery Voltage " textAlignment="CENTER" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="State of Charge " textAlignment="CENTER" GridPane.rowIndex="1" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Charge Current " textAlignment="CENTER" GridPane.rowIndex="2" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Load Current " textAlignment="CENTER" GridPane.rowIndex="3" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Today's Energy " textAlignment="CENTER" GridPane.rowIndex="4" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Battery Charging State " textAlignment="CENTER" GridPane.rowIndex="5" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="174.0" prefHeight="17.0" prefWidth="160.0" text="Load State " textAlignment="CENTER" GridPane.rowIndex="6" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="174.0" prefHeight="17.0" prefWidth="160.0" text="Temperature " textAlignment="CENTER" GridPane.rowIndex="7" />
+                        <Label text="Volts" GridPane.columnIndex="2" />
+                        <Label layoutX="289.0" layoutY="25.0" text="\%" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Amps" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Amps" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Label layoutX="289.0" layoutY="166.0" text="Watt-hours" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Mode" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Volts" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Volts" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets top="20.0" />
+                     </BorderPane.margin>
+                  </GridPane>
+               </center>
+               <top>
+                  <HBox prefHeight="55.0" prefWidth="720.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button mnemonicParsing="false" prefHeight="55.0" prefWidth="360.0" text="Controller" />
+                        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="360.0" text="Load" />
+                     </children>
+                  </HBox>
+               </top>
+               <left>
+                  <Pane prefHeight="395.0" prefWidth="55.0" BorderPane.alignment="CENTER" />
+               </left>
+               <right>
+                  <GridPane prefHeight="395.0" prefWidth="205.0" BorderPane.alignment="CENTER">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="96.0" minHeight="0.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="198.0" minHeight="0.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="274.0" minHeight="10.0" prefHeight="170.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="136.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="74.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="208.0" text="System Performance" />
+                        <Label alignment="TOP_CENTER" prefHeight="12.0" prefWidth="205.0" text="Total KiloWatt Hours Generated" GridPane.rowIndex="1" />
+                        <Label alignment="CENTER" prefHeight="130.0" prefWidth="205.0" text="kWh" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                        <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4">
+                           <children>
+                              <Button fx:id="currentRefresh1" alignment="CENTER" contentDisplay="RIGHT" layoutX="126.0" layoutY="3.0" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#refreshCurrentValues" prefHeight="55.0" prefWidth="60.0" text="Refresh Values" textAlignment="CENTER" wrapText="true" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </GridPane>
+               </right>
+            </BorderPane>
+            <BorderPane fx:id="dataLoggerBorderPane" prefHeight="450.0" prefWidth="720.0">
+               <top>
+                  <HBox prefHeight="55.0" prefWidth="720.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="currentSystemReadings111" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="180.0" text="Day" />
+                        <Button fx:id="currentSystemReadings11" mnemonicParsing="false" prefHeight="55.0" prefWidth="180.0" text="Week" />
+                        <Button fx:id="currentSystemSettings11" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="180.0" text="Month" />
+                        <Button fx:id="currentSystemSettings111" layoutX="250.0" layoutY="10.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="180.0" text="Year" />
+                     </children>
+                  </HBox>
+               </top>
+               <left>
+                  <Pane prefHeight="395.0" prefWidth="55.0" BorderPane.alignment="CENTER" />
+               </left>
+               <center>
+                  <LineChart title="System Values" BorderPane.alignment="CENTER">
+                    <xAxis>
+                      <CategoryAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis side="LEFT" />
+                    </yAxis>
+                  </LineChart>
+               </center>
+               <bottom>
+                  <GridPane BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <RadioButton mnemonicParsing="false" text="RadioButton" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.rowIndex="1" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.rowIndex="2" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                     </children>
+                  </GridPane>
+               </bottom>
+            </BorderPane>
+            <BorderPane fx:id="currentValuesBorderPane" prefHeight="450.0" prefWidth="720.0">
+               <center>
+                  <GridPane id="currentValuesGrid" fx:id="currentValuesGridPane" prefHeight="375.0" prefWidth="349.0" BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="239.0" minWidth="10.0" prefWidth="171.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="157.0" minWidth="10.0" prefWidth="71.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="209.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="46.0" minHeight="10.0" prefHeight="44.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <TextField fx:id="currentBatteryVoltage" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" />
+                        <TextField id="currentStageOfCharge" fx:id="currentStateOfCharge" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField id="currentChargeCurrent" fx:id="currentChargeCurrent" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField id="currentLoadCurrent" fx:id="currentLoadCurrent" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField id="currentTodaysEnergy" fx:id="currentTodaysEnergy" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField id="currentBatteryChargingState" fx:id="currentBatteryChargingState" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField id="currentLoadState" fx:id="currentLoadState" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField id="currentTemperature" fx:id="currentTemperature" alignment="CENTER_RIGHT" editable="false" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="160.0" text="Battery Voltage " textAlignment="CENTER" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="State of Charge " textAlignment="CENTER" GridPane.rowIndex="1" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Charge Current " textAlignment="CENTER" GridPane.rowIndex="2" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Load Current " textAlignment="CENTER" GridPane.rowIndex="3" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Today's Energy " textAlignment="CENTER" GridPane.rowIndex="4" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="18.0" prefHeight="17.0" prefWidth="160.0" text="Battery Charging State " textAlignment="CENTER" GridPane.rowIndex="5" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="174.0" prefHeight="17.0" prefWidth="160.0" text="Load State " textAlignment="CENTER" GridPane.rowIndex="6" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="10.0" layoutY="174.0" prefHeight="17.0" prefWidth="160.0" text="Temperature " textAlignment="CENTER" GridPane.rowIndex="7" />
+                        <Label text="Volts" GridPane.columnIndex="2" />
+                        <Label layoutX="289.0" layoutY="25.0" text="\%" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Amps" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Amps" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Label layoutX="289.0" layoutY="166.0" text="Watt-hours" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Mode" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Volts" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <Label layoutX="10.0" layoutY="25.0" text="Volts" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets top="20.0" />
+                     </BorderPane.margin>
+                  </GridPane>
+               </center>
+               <top>
+                  <HBox prefHeight="55.0" prefWidth="720.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="currentSystemReadings" mnemonicParsing="false" onAction="#handleSystemReadingsSelect" prefHeight="55.0" prefWidth="360.0" text="System Readings" />
+                        <Button fx:id="currentSystemSettings" mnemonicParsing="false" onAction="#handleSystemSettingsSelect" prefHeight="55.0" prefWidth="360.0" text="System Settings" />
+                     </children>
+                  </HBox>
+               </top>
+               <left>
+                  <Pane prefHeight="395.0" prefWidth="55.0" BorderPane.alignment="CENTER" />
+               </left>
+               <right>
+                  <GridPane prefHeight="395.0" prefWidth="205.0" BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="96.0" minHeight="0.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="198.0" minHeight="0.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="274.0" minHeight="10.0" prefHeight="170.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="136.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="74.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="208.0" text="System Performance" />
+                        <Label alignment="TOP_CENTER" prefHeight="12.0" prefWidth="205.0" text="Total KiloWatt Hours Generated" GridPane.rowIndex="1" />
+                        <Label alignment="CENTER" prefHeight="130.0" prefWidth="205.0" text="kWh" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                        <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4">
+                           <children>
+                              <Button fx:id="currentRefresh" alignment="CENTER" contentDisplay="RIGHT" layoutX="126.0" layoutY="3.0" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#refreshCurrentValues" prefHeight="55.0" prefWidth="60.0" text="Refresh Values" textAlignment="CENTER" wrapText="true" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </GridPane>
+               </right>
+            </BorderPane>
+         </children>
+         <FlowPane.margin>
+            <Insets top="30.0" />
+         </FlowPane.margin>
+      </StackPane>
+   </children>
+</FlowPane>

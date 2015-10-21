@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="971.0" stylesheets="@StyleSheet_CXlink.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cxlinkdev.model.IntroPageController">
+   <children>
+      <ImageView fitHeight="262.0" fitWidth="297.0" layoutX="328.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/CXLINK-circle.png" />
+         </image>
+      </ImageView>
+      <MenuButton fx:id="menuButton" layoutX="429.0" layoutY="454.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="Select" />
+      <Text layoutX="276.0" layoutY="428.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to CXLink, please select your charge controller" />
+   </children>
+</AnchorPane>
