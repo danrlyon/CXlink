@@ -5,22 +5,13 @@
  */
 package cxlinkdev.model;
 
-import cxlinkdev.*;
-
-import java.io.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javax.imageio.*;
-
+import java.io.FileInputStream;
 /**
  *
  * @author Dell-N7110
@@ -45,8 +36,8 @@ public class CXlinkDev extends Application {
         ScreensController mainContainer = new ScreensController();
         mainContainer.loadScreen(CXlinkDev.screen1ID, CXlinkDev.screen1File);
         mainContainer.loadScreen(CXlinkDev.screen2ID, CXlinkDev.screen2File);
-//        mainContainer.loadScreen(CXlinkDev.screen3ID, CXlinkDev.screen3File);
-//        mainContainer.loadScreen(CXlinkDev.screen4ID, CXlinkDev.screen4File); 
+        //mainContainer.loadScreen(CXlinkDev.screen3ID, CXlinkDev.screen3File);
+        //mainContainer.loadScreen(CXlinkDev.screen4ID, CXlinkDev.screen4File); 
         
         //Set the IntroPage
         mainContainer.setScreen(CXlinkDev.screen1ID);        
@@ -58,7 +49,7 @@ public class CXlinkDev extends Application {
         //Checks that logo is properly loaded, then loads it
         FileInputStream cxLinkLogo = null; 
         try {
-            cxLinkLogo = new FileInputStream("C:/Users/Dell-N7110/repos/CXlink/CXlinkDev/src/cxlinkdev/images/CXLINK-simple.png");
+            cxLinkLogo = new FileInputStream(System.getProperty("user.dir") + "/src/cxlinkdev/images/CXLINK-simple.png");
         }   catch (FileNotFoundException ex)    {
                 System.out.println("FileNotFoundException caught");
         }            
@@ -69,10 +60,7 @@ public class CXlinkDev extends Application {
         primaryStage.show(); 
         
     }
-    
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String[] args) {
         launch(args);
     }
