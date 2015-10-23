@@ -262,32 +262,35 @@ public class CXPageController implements Initializable, ControlledScreen {
         
     @FXML
     private void handleCurrentValuesSelect(ActionEvent event) throws SerialPortException, UnsupportedEncodingException  {
+        //Set selected button to bold
         this.currentValuesButton.setStyle("-fx-font-weight:bold");
         this.dataLoggerButton.setStyle("-fx-font-weight:normal");
         this.newSettingsButton.setStyle("-fx-font-weight:normal");        
         this.currentSystemReadings.setStyle("-fx-font-weight:bold");
         this.currentSystemSettings.setStyle("-fx-font-weight:normal");
-       
+        
+        //Set each borderPane to proper opacity, then remove and reload in the proper order
+        //Optimize in the future
         this.dataLoggerBorderPane.setOpacity(0);
         this.newSettingsBorderPane.setOpacity(0);
         this.currentValuesBorderPane.setOpacity(1);
-        
-//this.cxPageStackPane.getChildren().addAll(this.dataLoggerBorderPane, this.newSettingsBorderPane, this.currentValuesBorderPane);
         this.cxPageStackPane.getChildren().remove(0, 2);
         this.cxPageStackPane.getChildren().setAll(this.newSettingsBorderPane, this.dataLoggerBorderPane, this.currentValuesBorderPane);
     }
     
     
     @FXML
-    private void handleDataLoggerSelect(ActionEvent event)   {
-        this.currentValuesBorderPane.setOpacity(0);
-        this.newSettingsBorderPane.setOpacity(0);    
-        this.dataLoggerBorderPane.setOpacity(1);
+    private void handleDataLoggerSelect(ActionEvent event)   {        
+        //Set Selected buttons to bold
         this.currentValuesButton.setStyle("-fx-font-weight:normal");
         this.dataLoggerButton.setStyle("-fx-font-weight:bold");
         this.newSettingsButton.setStyle("-fx-font-weight:normal");
-        //this.dataDayButton.setStyle("-fx-font-weight:bold");
-        //this.cxPageStackPane.getChildren().addAll(this.currentValuesBorderPane, this.newSettingsBorderPane, this.dataLoggerBorderPane);
+        
+        //Set each borderPane to proper opacity, then remove and reload in the proper order
+        //Optimize in the future
+        this.currentValuesBorderPane.setOpacity(0);
+        this.newSettingsBorderPane.setOpacity(0);    
+        this.dataLoggerBorderPane.setOpacity(1);
         this.cxPageStackPane.getChildren().remove(0, 2);
         this.cxPageStackPane.getChildren().setAll(this.currentValuesBorderPane, this.newSettingsBorderPane, this.dataLoggerBorderPane);
         
@@ -295,15 +298,16 @@ public class CXPageController implements Initializable, ControlledScreen {
     
     @FXML
     private void handleNewSettingsSelect(ActionEvent event)   {
-        this.currentValuesBorderPane.setOpacity(0);
-        this.dataLoggerBorderPane.setOpacity(0);
-        this.newSettingsBorderPane.setOpacity(1);
+        //Set selected buttons to bold
         this.currentValuesButton.setStyle("-fx-font-weight:normal");
         this.dataLoggerButton.setStyle("-fx-font-weight:normal");
         this.newSettingsButton.setStyle("-fx-font-weight:bold");
-        //this.settingsControllerButton.setStyle("fx-font-weight:bold");
-        //this.cxPageStackPane.getChildren().addAll(this.dataLoggerBorderPane, this.currentValuesBorderPane, this.newSettingsBorderPane);
         
+        //Set each borderPane to proper opacity, then remove and reload in the proper order
+        //Optimize in the future
+        this.currentValuesBorderPane.setOpacity(0);
+        this.newSettingsBorderPane.setOpacity(1);    
+        this.dataLoggerBorderPane.setOpacity(0);
         this.cxPageStackPane.getChildren().remove(0, 2);
         this.cxPageStackPane.getChildren().setAll(this.currentValuesBorderPane, this.dataLoggerBorderPane, this.newSettingsBorderPane);
         

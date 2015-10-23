@@ -125,21 +125,26 @@ public final class CXCom {
     }
     
     
-    
+    //Until further notice, portCheck will only check for CXNsolidcontrollers
+    //in the future it will autodetect and autoconnect to any CX device
     public void portCheck() throws SerialPortException {
         this.portArrayPosition = 0;
         String[] portNames = SerialPortList.getPortNames();
         if ( portNames.length != 0 )    {
             for (String portNameTemp : portNames) {
-                System.out.println(portNameTemp);
+                System.out.println(portNameTemp);   //Can be deleted, used for debug
                 serialPort = new SerialPort(portNameTemp);
                 try {
-                    if ( (serialPort.openPort() == true) && (serialPort.setParams(9600, 8, 1, 0) == true ))  {
+                    if ( (serialPort.openPort() == true) && (serialPort.setParams(19200, 8, 1, 0) == true ))  {
                         this.portName[this.portArrayPosition] = portNameTemp;
-                        this.baudrate[this.portArrayPosition] = 9600;
-                        CXCom.serialPort.writeBytes(" ".getBytes());//Write data to port         
+                        this.baudrate[this.portArrayPosition] = 19200;
+                        int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
+                        serialPort.setEventsMask(mask);//Set mask
+                        serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
+                        CXCom.serialPort.writeBytes(" ".getBytes());   //Write data to port
+
                         //THIS GUY is causing the problems, need to create an event listener to listen for RX events instead of using readstring
-                        this.cxCurrentStatus[this.portArrayPosition] = CXCom.serialPort.readString(80);
+                        this.cxCurrentStatus[this.portArrayPosition] = CXCom.serialPort.readString(80) ;
 
                         if( this.cxCurrentStatus[this.portArrayPosition] != null )   {
                             System.out.println(cxCurrentStatus[this.portArrayPosition]);
@@ -150,16 +155,9 @@ public final class CXCom {
                                 this.controllerType[this.portArrayPosition] = 2;
                                 this.portArrayPosition++;
                             }                           
-                        }
-                    } else if ( serialPort.setParams(19200, 8, 1, 0) == true )  {
-                        if( serialPort.readBytes()!=null )    {
-                            this.portName[this.portArrayPosition] = portNameTemp;
-                            this.baudrate[this.portArrayPosition] = 19200;
-                            this.controllerType[this.portArrayPosition]= 3;
-                            this.portArrayPosition++;
-                        }
+                        }                    
                     } else      System.out.println("NoPortFound");
-
+                       
                     /*Needs to be able to handle multiple ports*/
                     serialPort.closePort();
                 }
