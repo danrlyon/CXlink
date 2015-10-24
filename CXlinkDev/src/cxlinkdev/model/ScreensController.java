@@ -44,11 +44,17 @@ public class ScreensController extends StackPane {
     public boolean loadScreen(String name, String resource) {
         try {
             URL location = getClass().getResource(resource);
+            System.out.println("1");
             FXMLLoader myLoader = new FXMLLoader(location);
+            System.out.println("2");
             Parent loadScreen = (Parent) myLoader.load();
+            System.out.println("3");
             ControlledScreen myScreenControler = ((ControlledScreen) myLoader.getController());
+            System.out.println("4");
             myScreenControler.setScreenParent(this);
+            System.out.println("5");
             addScreen(name, loadScreen);
+            System.out.println("6");
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -67,16 +73,13 @@ public class ScreensController extends StackPane {
             if (!getChildren().isEmpty()) {    //if there is more than one screen
                 Timeline fade = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(opacity, 1.0)),
-                        new KeyFrame(new Duration(1000), new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent t) {
-                        getChildren().remove(0);                    //remove the displayed screen
-                        getChildren().add(0, screens.get(name));     //add the screen
-                        Timeline fadeIn = new Timeline(
-                                new KeyFrame(Duration.ZERO, new KeyValue(opacity, 0.0)),
-                                new KeyFrame(new Duration(800), new KeyValue(opacity, 1.0)));
-                        fadeIn.play();
-                    }
+                        new KeyFrame(new Duration(1000), (ActionEvent t) -> {
+                            getChildren().remove(0);                    //remove the displayed screen
+                            getChildren().add(0, screens.get(name));     //add the screen
+                            Timeline fadeIn = new Timeline(
+                                    new KeyFrame(Duration.ZERO, new KeyValue(opacity, 0.0)),
+                                    new KeyFrame(new Duration(800), new KeyValue(opacity, 1.0)));
+                            fadeIn.play();
                 }, new KeyValue(opacity, 0.0)));
                 fade.play();
 

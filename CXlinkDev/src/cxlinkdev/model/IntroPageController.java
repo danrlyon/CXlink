@@ -11,6 +11,7 @@ import cxlinkdev.*;
 import static cxlinkdev.model.CXlinkDev.space;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -48,37 +49,37 @@ public class IntroPageController implements Initializable, ControlledScreen {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.loadPortMenuButton();
-    }
-    
-    public void loadPortMenuButton()    {
-        String[] cxMenuItems;
         try {
             this.cxCom = new CXCom();
-        } catch (SerialPortException ex) {
-            Logger.getLogger(CXPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
             this.cxCom.portCheck();
-        } catch (SerialPortException ex) {
+            this.loadPortMenuButton();
+        } catch (SerialPortException | UnsupportedEncodingException ex) {
             Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        if ( this.cxCom.getPortName(0)==null ) {
-            MenuItem menuItem = new MenuItem(this.cxCom.getCXType(0));
+    }
+    
+    
+    public void loadPortMenuButton() throws UnsupportedEncodingException    {
+        
+        int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
+        if ( controllerType ==0 ) {
+            MenuItem menuItem = new MenuItem("No CX detected");
             this.menuButton.getItems().add(menuItem);
         }   else    {        
-            for ( int i=0; this.cxCom.getPortName(i) != null ; i++)    {
-                MenuItem menuItem = new MenuItem(this.cxCom.getCXType(i));
-                if (!this.cxCom.getCXType(i).equals("No CX Detected"))  {
-                    menuItem.setOnAction((ActionEvent e) -> {
-                        myController.setScreen(CXlinkDev.screen2ID);
-                    });
-                } 
-                this.menuButton.getItems().add(menuItem);
-            }
+            
+            MenuItem menuItem = new MenuItem("CX");
+            menuItem.setOnAction((ActionEvent e) -> {
+                myController.setScreen(CXlinkDev.screen2ID);
+            }); 
+            this.menuButton.getItems().add(menuItem);
+            
         }
+        
+
+
     }
+    
     
     /**
      *
@@ -111,7 +112,11 @@ public class IntroPageController implements Initializable, ControlledScreen {
     
     @FXML
     private void handleRefreshSelect(ActionEvent event) throws SerialPortException {
-        this.loadPortMenuButton();        
+        try {        
+            this.loadPortMenuButton();
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @FXML
