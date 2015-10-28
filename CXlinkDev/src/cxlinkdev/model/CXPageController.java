@@ -204,11 +204,15 @@ public class CXPageController implements Initializable, ControlledScreen {
         
         
         this.cxCom.setStatus(1);
-        this.cxCom.portCheck();
+        try {
+            this.cxCom.portCheck();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CXPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //this.cxCom.printStatusCX(space,cxCom.getPortName());        
        // this.cxCurrentValues = this.cxCom.getCXCurrentValues(cxCom.getPortName());
         //this.cxDataLogger = this.cxCom.getCXDataLoggerValues("!", this.cxCom.getPortName());
-        System.out.println(this.cxCom.getDataLoggerValues());
+        //System.out.println(this.cxCom.getDataLoggerValues());
         
         //Set the TextFields to the most current data
         //Set current battery voltage

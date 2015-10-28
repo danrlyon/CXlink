@@ -18,5 +18,6 @@
       </ImageView>
       <MenuButton fx:id="menuButton" layoutX="429.0" layoutY="492.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="Select" />
       <Text layoutX="276.0" layoutY="428.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to CXLink, please select your charge controller" />
+      <Button fx:id="refreshButton" layoutX="923.0" layoutY="554.0" mnemonicParsing="false" onAction="#handleRefreshSelect" text="R" />
    </children>
 </AnchorPane>

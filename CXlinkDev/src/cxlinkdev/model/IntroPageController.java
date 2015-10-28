@@ -26,6 +26,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -44,43 +45,54 @@ public class IntroPageController implements Initializable, ControlledScreen {
     ScreensController myController;
     private CXCom cxCom;
     
-    @FXML
-    private MenuButton menuButton;
+    @FXML private MenuButton menuButton;
+    
+    @FXML private MenuItem cxConnectSelect;
+    @FXML private MenuItem cxnConnectSelect;
+    @FXML private MenuItem cxnSolidConnectSelect;
+    
+    @FXML private Button refreshButton;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            this.cxCom = new CXCom();
-            this.cxCom.portCheck();
-            this.loadPortMenuButton();
-        } catch (SerialPortException | UnsupportedEncodingException ex) {
-            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         
     }
     
     
     public void loadPortMenuButton() throws UnsupportedEncodingException    {
-        
-        int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
-        if ( controllerType ==0 ) {
-            MenuItem menuItem = new MenuItem("No CX detected");
-            this.menuButton.getItems().add(menuItem);
-        }   else    {        
-            
-            MenuItem menuItem = new MenuItem("CX");
-            menuItem.setOnAction((ActionEvent e) -> {
-                myController.setScreen(CXlinkDev.screen2ID);
-            }); 
-            this.menuButton.getItems().add(menuItem);
-            
+        try {
+            this.cxCom = new CXCom();
+            try {
+                this.cxCom.portCheck();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Could not complete portCheck");
+            }
+        } catch (SerialPortException | UnsupportedEncodingException ex) {
+            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Could not complete CXCominit");
         }
-        
+        int i;
+        for (i=0; this.cxCom.getControllerType(i)!= 0; i++)  {
+            int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
+            if(controllerType!=0){
+                this.menuButton.getItems().clear();
+                if ( controllerType ==0 ) {
+                    MenuItem menuItem = new MenuItem("No CX detected");
+                    this.menuButton.getItems().add(menuItem);
+                }   else    {        
 
-
+                    MenuItem menuItem = new MenuItem("CX");
+                    menuItem.setOnAction((ActionEvent e) -> {
+                        myController.setScreen(CXlinkDev.screen2ID);
+                    }); 
+                    this.menuButton.getItems().add(menuItem);
+                }
+            }
+        }
     }
-    
-    
+       
     /**
      *
      * @param screenParent
@@ -106,9 +118,7 @@ public class IntroPageController implements Initializable, ControlledScreen {
 //    }
 //    
     
-    @FXML private Label label;
-    @FXML private MenuItem CXConnectSelect;
-    @FXML private MenuItem CXNConnectSelect;
+    
     
     @FXML
     private void handleRefreshSelect(ActionEvent event) throws SerialPortException {
