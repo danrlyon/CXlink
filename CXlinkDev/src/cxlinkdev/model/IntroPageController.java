@@ -33,6 +33,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 
 
@@ -55,42 +56,70 @@ public class IntroPageController implements Initializable, ControlledScreen {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        String[] portNames = SerialPortList.getPortNames();
+        if(portNames.length==1)  {
+            try {
+                CXIdentifier cxIdentifier;
+                cxIdentifier = new CXIdentifier(portNames[0]);
+                String firstButton = CXIdentifier.retrieveType();
+                if(CXIdentifier.serialPort.isOpened()) CXIdentifier.serialPort.closePort();
+                if(firstButton==null)   {
+                    SolidIdentifier solidIdentifier = new SolidIdentifier(portNames[0]);
+                    firstButton = SolidIdentifier.retrieveType();
+                    if(SolidIdentifier.serialPort.isOpened()) SolidIdentifier.serialPort.closePort();
+                    if(firstButton==null) firstButton = "Serial Port Detected, But No CX detected";
+                }
+                System.out.println(firstButton);
+            } catch (SerialPortException ex) {
+                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (portNames.length>1)    {
+            for (String portNameTemp : portNames)  {
+                System.out.println("Not capable of handling multiple ports, to be added");
+            }
+        } else if (portNames.length==0) {
+            System.out.println("No Serial Ports detected");
+        }
         
     }
     
     
     public void loadPortMenuButton() throws UnsupportedEncodingException    {
-        try {
-            this.cxCom = new CXCom();
-            try {
-                this.cxCom.portCheck();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Could not complete portCheck");
-            }
-        } catch (SerialPortException | UnsupportedEncodingException ex) {
-            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Could not complete CXCominit");
-        }
-        int i;
-        for (i=0; this.cxCom.getControllerType(i)!= 0; i++)  {
-            int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
-            if(controllerType!=0){
-                this.menuButton.getItems().clear();
-                if ( controllerType ==0 ) {
-                    MenuItem menuItem = new MenuItem("No CX detected");
-                    this.menuButton.getItems().add(menuItem);
-                }   else    {        
-
-                    MenuItem menuItem = new MenuItem("CX");
-                    menuItem.setOnAction((ActionEvent e) -> {
-                        myController.setScreen(CXlinkDev.screen2ID);
-                    }); 
-                    this.menuButton.getItems().add(menuItem);
-                }
-            }
-        }
+        
+//        CXIdentifier.setBaudRate(19200);
+//        CXIdentifier.retrieveCurrentValues();
+        
+        
+//        try {
+//            this.cxCom = new CXCom();
+//            try {
+//                this.cxCom.portCheck();
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+//                System.out.println("Could not complete portCheck");
+//            }
+//        } catch (SerialPortException | UnsupportedEncodingException ex) {
+//            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+//            System.out.println("Could not complete CXCominit");
+//        }
+//        int i;
+//        for (i=0; this.cxCom.getControllerType(i)!= 0; i++)  {
+//            int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
+//            if(controllerType!=0){
+//                this.menuButton.getItems().clear();
+//                if ( controllerType ==0 ) {
+//                    MenuItem menuItem = new MenuItem("No CX detected");
+//                    this.menuButton.getItems().add(menuItem);
+//                }   else    {        
+//
+//                    MenuItem menuItem = new MenuItem("CX");
+//                    menuItem.setOnAction((ActionEvent e) -> {
+//                        myController.setScreen(CXlinkDev.screen2ID);
+//                    }); 
+//                    this.menuButton.getItems().add(menuItem);
+//                }
+//            }
+//        }
     }
        
     /**
