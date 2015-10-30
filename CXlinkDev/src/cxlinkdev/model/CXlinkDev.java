@@ -21,12 +21,17 @@ public class CXlinkDev extends Application {
     //Variables for global use
     public static final String space = " ";
     public static final String exclamation = "!";
+    public static String selectedPort = "NONE";
     
     //FXML files and IDs for each screen
     public static String screen1ID = "main";
     public static String screen1File = "IntroPage.fxml";
     public static String screen2ID = "cxpage";
     public static String screen2File = "CXPage.fxml";
+    public static String screen3ID = "cxnpage";
+    public static String screen3File = "CXNPage.fxml";
+    public static String screen4ID = "cxnsolidpage";
+    public static String screen4File = "CXNsolidPage.fxml";
     
     
     @Override
@@ -36,8 +41,8 @@ public class CXlinkDev extends Application {
         ScreensController mainContainer = new ScreensController();
         mainContainer.loadScreen(CXlinkDev.screen1ID, CXlinkDev.screen1File);
         mainContainer.loadScreen(CXlinkDev.screen2ID, CXlinkDev.screen2File);
-        //mainContainer.loadScreen(CXlinkDev.screen3ID, CXlinkDev.screen3File);
-        //mainContainer.loadScreen(CXlinkDev.screen4ID, CXlinkDev.screen4File); 
+        mainContainer.loadScreen(CXlinkDev.screen3ID, CXlinkDev.screen3File);
+        mainContainer.loadScreen(CXlinkDev.screen4ID, CXlinkDev.screen4File); 
         
         //Set the IntroPage
         mainContainer.setScreen(CXlinkDev.screen1ID);        
