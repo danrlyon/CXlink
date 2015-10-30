@@ -8,7 +8,7 @@ package cxlinkdev.model;
 import cxlinkdev.*;
 //import cxlinkdev.model.CXCom;
 //import cxlinkdev.model.CXlinkDev;
-import static cxlinkdev.model.CXlinkDev.space;
+import static cxlinkdev.model.CXlinkDev.selectedPort;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -44,8 +44,7 @@ import jssc.SerialPortList;
 public class IntroPageController implements Initializable, ControlledScreen {
     
     ScreensController myController;
-    private CXCom cxCom;
-    
+       
     @FXML private MenuButton menuButton;
     
     @FXML private MenuItem cxConnectSelect;
@@ -57,69 +56,140 @@ public class IntroPageController implements Initializable, ControlledScreen {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         String[] portNames = SerialPortList.getPortNames();
+        String firstButton = null;
         if(portNames.length==1)  {
             try {
                 CXIdentifier cxIdentifier;
                 cxIdentifier = new CXIdentifier(portNames[0]);
-                String firstButton = CXIdentifier.retrieveType();
+                firstButton = CXIdentifier.retrieveType();
                 if(CXIdentifier.serialPort.isOpened()) CXIdentifier.serialPort.closePort();
                 if(firstButton==null)   {
                     SolidIdentifier solidIdentifier = new SolidIdentifier(portNames[0]);
                     firstButton = SolidIdentifier.retrieveType();
                     if(SolidIdentifier.serialPort.isOpened()) SolidIdentifier.serialPort.closePort();
-                    if(firstButton==null) firstButton = "Serial Port Detected, But No CX detected";
-                }
+                    if(firstButton==null) firstButton = "No CX detected";
+                }                
                 System.out.println(firstButton);
             } catch (SerialPortException ex) {
                 Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            if (firstButton==null)  {
+                MenuItem menuItem = new MenuItem("Error in page init, firstButton is null");
+                this.menuButton.getItems().add(menuItem);
+            } else  {
+                MenuItem menuItem = new MenuItem(portNames[0]+": "+firstButton);
+                this.menuButton.getItems().add(menuItem);               
+                menuItem.setOnAction((ActionEvent event) -> {
+                    //Should Check the selection first, then load appropriate page
+                    if( menuItem.getText().endsWith("CXNsolid") )  {
+                        myController.setScreen(CXlinkDev.screen4ID);
+                    }else if( menuItem.getText().endsWith("CXN") )  {
+                        myController.setScreen(CXlinkDev.screen3ID);
+                    }else if( menuItem.getText().endsWith("CX") )  {
+                        myController.setScreen(CXlinkDev.screen2ID);
+                    }else System.out.println("No Controller Connected");                                      
+                });
+            }        
         } else if (portNames.length>1)    {
             for (String portNameTemp : portNames)  {
                 System.out.println("Not capable of handling multiple ports, to be added");
             }
         } else if (portNames.length==0) {
             System.out.println("No Serial Ports detected");
-        }
+            MenuItem menuItem = new MenuItem("No Serial Ports Detected: Check Connections");
+            this.menuButton.getItems().add(menuItem);
+        } else System.out.println("Error, portNames can't be negative");
         
     }
     
     
     public void loadPortMenuButton() throws UnsupportedEncodingException    {
-        
-//        CXIdentifier.setBaudRate(19200);
-//        CXIdentifier.retrieveCurrentValues();
-        
-        
-//        try {
-//            this.cxCom = new CXCom();
-//            try {
-//                this.cxCom.portCheck();
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
-//                System.out.println("Could not complete portCheck");
-//            }
-//        } catch (SerialPortException | UnsupportedEncodingException ex) {
-//            Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
-//            System.out.println("Could not complete CXCominit");
-//        }
-//        int i;
-//        for (i=0; this.cxCom.getControllerType(i)!= 0; i++)  {
-//            int controllerType = this.cxCom.getControllerType(this.cxCom.getPortArrayPosition());
-//            if(controllerType!=0){
-//                this.menuButton.getItems().clear();
-//                if ( controllerType ==0 ) {
-//                    MenuItem menuItem = new MenuItem("No CX detected");
-//                    this.menuButton.getItems().add(menuItem);
-//                }   else    {        
-//
-//                    MenuItem menuItem = new MenuItem("CX");
-//                    menuItem.setOnAction((ActionEvent e) -> {
-//                        myController.setScreen(CXlinkDev.screen2ID);
-//                    }); 
-//                    this.menuButton.getItems().add(menuItem);
-//                }
-//            }
-//        }
+        while( !this.menuButton.getItems().isEmpty() )  {
+            this.menuButton.getItems().remove(0);
+        }
+        String[] portNames = SerialPortList.getPortNames();
+        String[] menuItems = new String[portNames.length];
+       
+        //menuItems = null;
+        int menuItemPosition = 0;
+        if(portNames.length==1)  {
+            try {
+                CXIdentifier cxIdentifier;
+                cxIdentifier = new CXIdentifier(portNames[0]);
+                menuItems[0] = CXIdentifier.retrieveType();
+                if(CXIdentifier.serialPort.isOpened()) CXIdentifier.serialPort.closePort();
+                if(menuItems[0]==null)   {
+                    SolidIdentifier solidIdentifier = new SolidIdentifier(portNames[0]);
+                    menuItems[0] = SolidIdentifier.retrieveType();
+                    if(SolidIdentifier.serialPort.isOpened()) SolidIdentifier.serialPort.closePort();
+                    if(menuItems[0]==null) menuItems[0] = "No CX detected";
+                }                
+                System.out.println(menuItems[0]);
+            } catch (SerialPortException ex) {
+                Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (menuItems[0]==null)  {
+                MenuItem menuItem = new MenuItem("Error in page init, menuItems[0] is null");
+                this.menuButton.getItems().add(menuItem);
+            } else  {
+                MenuItem menuItem = new MenuItem(portNames[0]+": "+menuItems[0]);
+                this.menuButton.getItems().add(menuItem);               
+                menuItem.setOnAction((ActionEvent event) -> {
+                    //Should Check the selection first, then load appropriate page
+                    if( menuItem.getText().endsWith("CXNsolid") )  {
+                        CXlinkDev.selectedPort=menuItem.getText();
+                        myController.setScreen(CXlinkDev.screen4ID);
+                    }else if( menuItem.getText().endsWith("CXN") )  {
+                        CXlinkDev.selectedPort=menuItem.getText();
+                        myController.setScreen(CXlinkDev.screen3ID);
+                    }else if( menuItem.getText().endsWith("CX") )  {
+                        CXlinkDev.selectedPort=menuItem.getText();
+                        myController.setScreen(CXlinkDev.screen2ID);
+                    }else System.out.println("No Controller Connected");                                      
+                });
+            }        
+        } else if (portNames.length>1)    {
+            menuItemPosition = 0;
+            for (String portNameTemp : portNames)  {
+                try {
+                    CXIdentifier cxIdentifier;
+                    cxIdentifier = new CXIdentifier(portNames[0]);
+                    menuItems[menuItemPosition] = CXIdentifier.retrieveType();
+                    if(CXIdentifier.serialPort.isOpened()) CXIdentifier.serialPort.closePort();
+                    if(menuItems[menuItemPosition]==null)   {
+                        SolidIdentifier solidIdentifier = new SolidIdentifier(portNames[0]);
+                        menuItems[menuItemPosition] = SolidIdentifier.retrieveType();
+                        if(SolidIdentifier.serialPort.isOpened()) SolidIdentifier.serialPort.closePort();
+                        if(menuItems[menuItemPosition]==null) menuItems[menuItemPosition] = "No CX detected";
+                    }                
+                    System.out.println(menuItems[menuItemPosition]);
+                } catch (SerialPortException ex) {
+                    Logger.getLogger(IntroPageController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (menuItems[menuItemPosition]==null)  {
+                    MenuItem menuItem = new MenuItem("Error in page init, menuItems[menuItemPosition] is null");
+                    this.menuButton.getItems().add(menuItem);
+                } else  {
+                    MenuItem menuItem = new MenuItem(portNames[0]+": "+menuItems[menuItemPosition]);
+                    this.menuButton.getItems().add(menuItem);               
+                    menuItem.setOnAction((ActionEvent event) -> {
+                        //Should Check the selection first, then load appropriate page
+                        if( menuItem.getText().endsWith("CXNsolid") )  {
+                            myController.setScreen(CXlinkDev.screen4ID);
+                        }else if( menuItem.getText().endsWith("CXN") )  {
+                            myController.setScreen(CXlinkDev.screen3ID);
+                        }else if( menuItem.getText().endsWith("CX") )  {
+                            myController.setScreen(CXlinkDev.screen2ID);
+                        }else System.out.println("No Controller Connected");                                      
+                    });
+                }
+                if( portNames.length>menuItemPosition)menuItemPosition++;
+            }
+        } else if (portNames.length==0) {
+            System.out.println("No Serial Ports detected");
+            MenuItem menuItem = new MenuItem("No Serial Ports Detected: Check Connections");
+            this.menuButton.getItems().add(menuItem);
+        } else System.out.println("Error, portNames can't be negative");
     }
        
     /**
@@ -131,21 +201,7 @@ public class IntroPageController implements Initializable, ControlledScreen {
         myController = screenParent;
     }
 
-//    @FXML
-//    private void goToScreen2(ActionEvent event){
-//       myController.setScreen(CXlinkDev.screen2ID);
-//    }
-//    
-//    @FXML
-//    private void goToScreen3(ActionEvent event){
-//       myController.setScreen(CXlinkDev.screen3ID);
-//    }
-//    
-//    @FXML
-//    private void goToScreen4(ActionEvent event){
-//       myController.setScreen(CXlinkDev.screen4ID);
-//    }
-//    
+ 
     
     
     

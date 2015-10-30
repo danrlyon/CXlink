@@ -1,7 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * TO DO List:
+ *
+ * -remove static
+ * 
+ *
  */
 package cxlinkdev.model;
 
@@ -30,6 +32,7 @@ public class SolidIdentifier {
      */
         public SolidIdentifier(String portName) {
         serialPort = new SerialPort(portName); //args in the future
+        type = null;
         try {
             serialPort.openPort();//Open port
             setBaudRate(19200);//Set Params
