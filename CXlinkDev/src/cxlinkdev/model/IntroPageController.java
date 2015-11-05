@@ -8,6 +8,7 @@ package cxlinkdev.model;
 import cxlinkdev.*;
 //import cxlinkdev.model.CXCom;
 //import cxlinkdev.model.CXlinkDev;
+import static cxlinkdev.model.CXlinkDev.controllerType;
 import static cxlinkdev.model.CXlinkDev.selectedPort;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import jssc.SerialPortList;
 public class IntroPageController implements Initializable, ControlledScreen {
     
     ScreensController myController;
+    private String connectedPortName;
        
     @FXML private MenuButton menuButton;
     
@@ -82,11 +84,38 @@ public class IntroPageController implements Initializable, ControlledScreen {
                 menuItem.setOnAction((ActionEvent event) -> {
                     //Should Check the selection first, then load appropriate page
                     if( menuItem.getText().endsWith("CXNsolid") )  {
-                        myController.setScreen(CXlinkDev.screen4ID);
+                        myController.setScreen(CXlinkDev.screen4ID); 
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CXNsolid";
                     }else if( menuItem.getText().endsWith("CXN") )  {
                         myController.setScreen(CXlinkDev.screen3ID);
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CXN";
                     }else if( menuItem.getText().endsWith("CX") )  {
                         myController.setScreen(CXlinkDev.screen2ID);
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CX";
                     }else System.out.println("No Controller Connected");                                      
                 });
             }        
@@ -137,14 +166,38 @@ public class IntroPageController implements Initializable, ControlledScreen {
                 menuItem.setOnAction((ActionEvent event) -> {
                     //Should Check the selection first, then load appropriate page
                     if( menuItem.getText().endsWith("CXNsolid") )  {
-                        CXlinkDev.selectedPort=menuItem.getText();
-                        myController.setScreen(CXlinkDev.screen4ID);
+                        myController.setScreen(CXlinkDev.screen4ID); 
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CXNsolid";
                     }else if( menuItem.getText().endsWith("CXN") )  {
-                        CXlinkDev.selectedPort=menuItem.getText();
                         myController.setScreen(CXlinkDev.screen3ID);
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CXN";
                     }else if( menuItem.getText().endsWith("CX") )  {
-                        CXlinkDev.selectedPort=menuItem.getText();
                         myController.setScreen(CXlinkDev.screen2ID);
+                        this.connectedPortName = menuItem.getText();
+                        if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(4)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);                            
+                        } else if (this.connectedPortName.contains("COM") && this.connectedPortName.charAt(5)==":".charAt(0) )     { 
+                            selectedPort = this.connectedPortName.substring(0, 4);
+                            System.out.println(selectedPort);
+                        }
+                        controllerType = "CX";
                     }else System.out.println("No Controller Connected");                                      
                 });
             }        

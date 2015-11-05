@@ -22,6 +22,7 @@ public class CXlinkDev extends Application {
     public static final String space = " ";
     public static final String exclamation = "!";
     public static String selectedPort = "NONE";
+    public static String controllerType = "NONE";
     
     //FXML files and IDs for each screen
     public static String screen1ID = "main";

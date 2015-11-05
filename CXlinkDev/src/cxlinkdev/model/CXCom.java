@@ -5,6 +5,8 @@
  */
 package cxlinkdev.model;
 
+import static cxlinkdev.model.CXlinkDev.selectedPort;
+import static cxlinkdev.model.CXlinkDev.controllerType;
 import static cxlinkdev.model.CXlinkDev.space;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -16,6 +18,7 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortEventListener;
+import jssc.SerialPortTimeoutException;
 
 
 /**
@@ -24,222 +27,126 @@ import jssc.SerialPortEventListener;
  */
 public final class CXCom {
     
-    private int[] status;
-    private int[] controllerType;         //1=CX, 2=CXN, 3=CXNsolid
+    private int status;
+    //private int controllerType;         //1=CX, 2=CXN, 3=CXNsolid    
+    static String cxCurrentStatus;     
+    static String cxDataLogger;
+    private String cxSettings;
     
-    private String[] cxCurrentStatus;
-    private String[] cxDataLogger;
-    //private String portNameTemp
-  
-    /*portName should be dynamically allocated*/
-    private String[] portName; 
-    private final int[] baudrate;
-    private int portArrayPosition;
-    private volatile boolean running = false;
-    
-    //private SerialPort serialPort;
-    
-    InputStream inputStream;
-    private Object args;
-    
+    static SerialPort serialPort;  
+    private int baudrate;
+       
     public CXCom() throws SerialPortException {    
+                
         
-        this.setPortNames();
-        int arraySize = portName.length;
-        this.status = new int[arraySize];
-        this.controllerType = new int[arraySize];
-        this.cxCurrentStatus = new String[arraySize];
-        this.cxDataLogger = new String[arraySize];
-        this.portArrayPosition=-1;
-        this.baudrate = new int[arraySize];
-        //this.setStatus(0);
+        this.setStatus(0);        
+        cxCurrentStatus = null;
+        cxDataLogger = null;
+        if ( controllerType.equals("CX")||controllerType.equals("CXN") )    {
+            this.baudrate=9600;
+        } else if ( controllerType.equals("CXNsolid") ) {
+            this.baudrate=19200;
+        } else this.baudrate=0;
+        
         //this.portCheck();
         
-    }
-    
-    public int getPortArrayPosition() {
-        return this.portArrayPosition;
-    }
+    }    
     
     public void setStatus(int tempStatus)   {
-        this.status[this.portArrayPosition] = tempStatus;
+        this.status = tempStatus;
+    }
+        
+    public String getCXType()   {
+        return controllerType;
     }
     
-    public void setPortName(int arrayIndex, String tempPortName)    {
-        this.portName[arrayIndex] = tempPortName;
+    public String getCXDataLoggerValues() {
+        return this.cxDataLogger;
     }
     
-    public String getPortName(int position)     {
-        return this.portName[position];
-    }
-    
-    public int getControllerType(int position)  {
-        if (position<this.portName.length){
-            return this.controllerType[position];
-        } else return 0;        
-    }
-    public String getCXType(int position)   {
-        String cxType;
-        switch (this.controllerType[position])    {
-            case 1: cxType = "CX";
-                break;
-            case 2: cxType = "CXN";
-                break;
-            case 3: cxType = "CXNsolid";
-                break;
-            default: cxType = "No CX Detected";
-                break;
-        }
-        return cxType;
-    }
-    
-    public String getCXDataLoggerValues(int position) {
-        return this.cxDataLogger[position];
-    }
-    
-    public void setCXDataLoggerValues( String data, int position ) {
-        this.cxDataLogger[position] = data;
-    }
-    
-    public String getCXCurrentValues(int position)  {
-        return this.cxCurrentStatus[position];
-    }
+    public void setCXDataLoggerValues(  ) {
+        serialPort = new SerialPort(selectedPort);
+        cxDataLogger = null;
+        try {
+            serialPort.openPort();//Open port
+            serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
+            int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
+            //serialPort.setEventsMask(mask);//Set mask
+            //serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
+            serialPort.writeString("!");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                cxDataLogger = serialPort.readString(4000, 10000);  //Needs to be optimized
+            } catch (SerialPortTimeoutException ex) {
+                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
-    public String getCXCurrentValues(String portNameTemp){
-        //String[] portNames = SerialPortList.getPortNames();
-        System.out.println(portNameTemp);
-        SerialPort serialPort;
-        serialPort = new SerialPort(portNameTemp);
-        try {
-            serialPort.openPort();//Open port
-            if ( serialPort.setParams(9600, 8, 1, 0) == false ) System.out.println ("Baudcheck false");//Set params
-            else this.portName[this.portArrayPosition] = portNameTemp;
-            /*Needs to be able to handle multiple ports*/
             serialPort.closePort();
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
         }
-                    
-        return this.cxCurrentStatus[this.portArrayPosition];
+        
+        System.out.println(cxDataLogger);
     }
     
-    public String getCXDataLoggerValues(String args, String portNameTemp)    {
-        System.out.println(portNameTemp);
-        SerialPort serialPort;
-        serialPort = new SerialPort(portNameTemp);
+    public void setBaudRate(int baudTemp)   {
+        this.baudrate = baudTemp;
+    }
+      
+    
+    public void setCXCurrentValues(){        
+        serialPort = new SerialPort(selectedPort);
+        cxCurrentStatus = null;
         try {
             serialPort.openPort();//Open port
-            if ( serialPort.setParams(9600, 8, 1, 0) == false ) System.out.println ("Baudcheck false");//Set params
-            else this.portName[this.portArrayPosition] = portNameTemp;
-            /*Needs to be able to handle multiple ports*/
-            serialPort.writeBytes("!".getBytes());       //(args.getBytes());//Write data to port
-            this.cxDataLogger[this.portArrayPosition] = serialPort.readString(767);
+            serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
+            int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
+            //serialPort.setEventsMask(mask);//Set mask
+            //serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
+            serialPort.writeString(" ");
+            try {
+                cxCurrentStatus = serialPort.readString(96, 1000);
+            } catch (SerialPortTimeoutException ex) {
+                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+            }
             serialPort.closePort();
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
-        }
-                    
-        return this.cxDataLogger[this.portArrayPosition];
+        }       
+        System.out.println(cxCurrentStatus);
     }
     
-    public void setPortNames()  {
-        this.portName = null;
-        this.portName = SerialPortList.getPortNames();
-    }
-        
-    //Update again, back to focusing on the CXNsolid
-    //in the future it will autodetect and autoconnect to any CX device
-    public void portCheck() throws SerialPortException, UnsupportedEncodingException, InterruptedException {        
-        Thread cxCheck = new Thread(new CXRunnable());
-        Thread cxnCheck = new Thread(new CXNRunnable());
-        Thread cxnSolidCheck = new Thread(new CXNSolidRunnable());
-        long patience = 500; //Set in milliseconds
-        this.portArrayPosition = -1;
-        this.setPortNames();
-        if ( portName.length !=0 )    {
-           
-                System.out.println("Starting CXRunnable thread");
-                long startTime = System.currentTimeMillis();
-                this.setRunning(true);
-                cxCheck.start();
-                System.out.println("Waiting for CXRunnable thread to finish");
-                // loop until CXRunnable
-                // thread exits or lasts longer than patience
-                while (cxCheck.isAlive()&this.running) {
-                    System.out.println("Still waiting...");
-                    // Wait maximum of .05 second
-                    // for CXRunnable thread
-                    // to finish.
-                    cxCheck.join(50);
-                    if (((System.currentTimeMillis() - startTime) > patience)
-                          && cxCheck.isAlive()) {
-                        System.out.println("Tired of waiting!");                        
-                        cxCheck.interrupt();                        
-                        // Shouldn't be long now
-                        // -- wait indefinitely
-                        this.setRunning(false);
-                        cxCheck.join();
-                        
-                        
-                    }
-                //System.out.println("Completed CXRunnable"); 
-
-                
-        }
-        
-       
-    }
-        
-
-    }
-     public void setRunning(Boolean runningState ){
-        this.running = runningState;
+    public String getCXCurrentValue()   {
+        return cxCurrentStatus;
     }
     
-    public static void printPorts(String[] args) {
-        String[] portNames = SerialPortList.getPortNames();
-        for (String portName : portNames) {
-            System.out.println(portName);
-        }
-    }
     
-    public void printStatusCX(String args, String portName) throws UnsupportedEncodingException {
-        SerialPort serialPort;
-        serialPort = new SerialPort(portName);
-        byte[] temp;
-        try {
-            serialPort.openPort();//Open serial port
-            serialPort.setParams(SerialPort.BAUDRATE_9600, 
-                                 SerialPort.DATABITS_8,
-                                 SerialPort.STOPBITS_1,
-                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-            serialPort.writeBytes(args.getBytes());//Write data to port
-            cxCurrentStatus[this.portArrayPosition] = serialPort.readString(64);
-            serialPort.closePort();//Close serial port
-            System.out.println( cxCurrentStatus[this.portArrayPosition] );
-        }
-        catch (SerialPortException ex) {
-            System.out.println(ex);
-        }
-       
-    }
     
-    public void readCX(String args) throws UnsupportedEncodingException {
-        SerialPort serialRead = new SerialPort("COM1");
-        try {
-            serialRead.openPort();//Open serial port
-            serialRead.setParams(9600, 8, 1, 0);//Set params.
-            byte[] buffer;
-            buffer = serialRead.readBytes();
-            cxCurrentStatus[this.portArrayPosition] = new String(buffer, "UTF-8");
-            serialRead.closePort();//Close serial port
-        }
-        catch (SerialPortException ex) {
-            System.out.println(ex);
-        }
-    }
+//    public String getCXDataLoggerValues(String args, String portNameTemp)    {
+//        System.out.println(portNameTemp);
+//        SerialPort serialPort;
+//        serialPort = new SerialPort(portNameTemp);
+//        try {
+//            serialPort.openPort();//Open port
+//            if ( serialPort.setParams(9600, 8, 1, 0) == false ) System.out.println ("Baudcheck false");//Set params
+//            else this.portName[this.portArrayPosition] = portNameTemp;
+//            /*Needs to be able to handle multiple ports*/
+//            serialPort.writeBytes("!".getBytes());       //(args.getBytes());//Write data to port
+//            this.cxDataLogger = serialPort.readString(767);
+//            serialPort.closePort();
+//        }
+//        catch (SerialPortException ex) {
+//            System.out.println(ex);
+//        }
+//                    
+//        return this.cxDataLogger;
+//    }   
     
     public static byte hexStringToByte(String s) {
         int len = s.length();
@@ -257,180 +164,52 @@ public final class CXCom {
         return data;
     } 
     
-    public class CXRunnable implements Runnable {
-        
-        
-        
+   /*
+     * In this class must implement the method serialEvent, through it we learn about 
+     * events that happened to our port. But we will not report on all events but only 
+     * those that we put in the mask. In this case the arrival of the data and change the 
+     * status lines CTS and DSR
+     */
+    static class SerialPortReader implements SerialPortEventListener {
+
         @Override
-        public void run() {
-            // We've been interrupted: no more messages.         
+        public void serialEvent(SerialPortEvent event) {
+            String rxString;
             
-                String[] portNames = SerialPortList.getPortNames();
-                if ( portNames.length !=0 )    {
-                    for (String portNameTemp : portNames) {
-                        
-                        System.out.println(portNameTemp);   //Can be deleted, used for debug
-                        SerialPort serialPort;
-                        serialPort = new SerialPort(portNameTemp);
-                        try {
-                            //serialPort.closePort();
-                            serialPort.openPort();//Open serial port
-                            serialPort.setParams(SerialPort.BAUDRATE_9600,
-                                    SerialPort.DATABITS_8,
-                                    SerialPort.STOPBITS_1,
-                                    SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-                            
-                            serialPort.writeString(space);
-                            String buffer = serialPort.readString(65) ;
-                            System.out.println(buffer);
-                            
-                            if( !buffer.substring(64).equals("0") ) {
-                                controllerType[portArrayPosition] = 1;
-                            }
-                            else    {
-                                controllerType[portArrayPosition] = 2;
-                                System.out.println("Go to bed");
-                            }
-                            cxCurrentStatus[portArrayPosition] = buffer;
-                            serialPort.closePort();//Close serial port
-                        }
-                        catch (SerialPortException ex) {
-                            System.out.println(ex);
-                            
-                        }
-                    }
-                } else  {
-                    System.out.println("NoPortFound");
-                    controllerType[portArrayPosition] = 0;
-                }
-            
-        
-    }
-        
-    }
-    public class CXNRunnable implements Runnable {
-                      
-        @Override
-        public void run() {    
-            String[] portNames = SerialPortList.getPortNames();
-            if ( portNames.length !=0 )    {
-                for (String portNameTemp : portNames) {
-                    
-                    System.out.println(portNameTemp);   //Can be deleted, used for debug
-                    SerialPort serialPort;
-                    serialPort = new SerialPort(portNameTemp);
+            if(event.isRXCHAR()){//If data is available
+                if(event.getEventValue() == 65 && controllerType.equals("CX") ){//Check bytes count in the input buffer
                     try {
-                        serialPort.openPort();//Open serial port
-                        serialPort.setParams(SerialPort.BAUDRATE_19200,
-                                SerialPort.DATABITS_8,
-                                SerialPort.STOPBITS_1,
-                                SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-                        String buffer = serialPort.readString(65) ;
-                        serialPort.writeString(space);
-                        
-                        System.out.println(buffer);
-                        
-                        if( !buffer.substring(64).equals("0") ) {
-                            controllerType[portArrayPosition] = 1;
-                        }
-                        else    {
-                            controllerType[portArrayPosition] = 2;
-                            System.out.println("Go to bed");
-                        }
-                        cxCurrentStatus[portArrayPosition] = buffer;
-                        serialPort.closePort();//Close serial port
+                        String buffer = serialPort.readString(65);
+                        System.out.println(buffer + "string read from serial port \n");
+                        cxCurrentStatus = buffer;
+                        serialPort.closePort();
                     }
                     catch (SerialPortException ex) {
                         System.out.println(ex);
                     }
-                }
-            } else  {
-                System.out.println("NoPortFound");
-                controllerType[portArrayPosition] = 0;
-            }
-            
-        }
-        
-    }
-    public class CXNSolidRunnable implements Runnable {
-                      
-        @Override
-        public void run() {    
-            String[] portNames = SerialPortList.getPortNames();
-            if ( portNames.length !=0 )    {
-                for (String portNameTemp : portNames) {
-                    
-                    System.out.println(portNameTemp);   //Can be deleted, used for debug
-                    SerialPort serialPort;
-                    serialPort = new SerialPort(portNameTemp);
+                } else if(event.getEventValue() == 83 && controllerType.equals("CXN") )  {
                     try {
-                        serialPort.openPort();//Open serial port
-                        serialPort.setParams(SerialPort.BAUDRATE_19200,
-                                SerialPort.DATABITS_8,
-                                SerialPort.STOPBITS_1,
-                                SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-                        String buffer = serialPort.readString(65) ;
-                        serialPort.writeString(space);
-                        
-                        System.out.println(buffer);
-                        
-                        if( !buffer.substring(64).equals("0") ) {
-                            controllerType[portArrayPosition] = 1;
-                        }
-                        else    {
-                            controllerType[portArrayPosition] = 2;
-                            System.out.println("Go to bed");
-                        }
-                        cxCurrentStatus[portArrayPosition] = buffer;
-                        serialPort.closePort();//Close serial port
+                        String buffer = serialPort.readString(83);
+                        System.out.println(buffer + "string read from serial port \n");
+                        cxCurrentStatus = buffer;
+                        serialPort.closePort();
                     }
                     catch (SerialPortException ex) {
                         System.out.println(ex);
                     }
-                }
-            } else  {
-                System.out.println("NoPortFound");
-                controllerType[portArrayPosition] = 0;
-            }
-        }
+                } else if(event.getEventValue() == 96 && controllerType.equals("CXNsolid"))  {
+                    try {
+                        String buffer = serialPort.readString(96);
+                        System.out.println(buffer + "string read from serial port \n");
+                        cxCurrentStatus = buffer;
+                        serialPort.closePort();
+                    }
+                    catch (SerialPortException ex) {
+                        System.out.println(ex);
+                    }
+                }               
+            }else ;
         
+        }
     }
 }
-
-//    static class SerialPortReader implements SerialPortEventListener {
-//
-//        @Override
-//        public void serialEvent(SerialPortEvent event) {
-//            String buffer = null;
-//            if(event.isRXCHAR()){//If data is available
-//                if(event.getEventValue() == 10){//Check bytes count in the input buffer
-//                    //Read data, if 10 bytes available 
-//                    try {
-//                        cxCurrentStatus[0] = serialPort.readString();
-//                    }
-//                    catch (SerialPortException ex) {
-//                        System.out.println(ex);
-//                    }
-//                }
-//            }
-//            else if(event.isCTS()){//If CTS line has changed state
-//                if(event.getEventValue() == 1){//If line is ON
-//                    System.out.println("CTS - ON");
-//                }
-//                else {
-//                    System.out.println("CTS - OFF");
-//                }
-//            }
-//            else if(event.isDSR()){///If DSR line has changed state
-//                if(event.getEventValue() == 1){//If line is ON
-//                    System.out.println("DSR - ON");
-//                }
-//                else {
-//                    System.out.println("DSR - OFF");
-//                }
-//            }
-//        }
-//    }
-
-        
-    
