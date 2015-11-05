@@ -41,7 +41,7 @@ public class SolidIdentifier {
             serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
             serialPort.writeString(" ");
             try {
-                Thread.sleep(500);                 //Optimize this value, .5 secs for now
+                Thread.sleep(1000);                 //Optimize this value, 1 secs for now
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }            

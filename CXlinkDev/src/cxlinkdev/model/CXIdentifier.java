@@ -47,7 +47,7 @@ public class CXIdentifier {
             serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
             serialPort.writeString(" ");
             try {
-                Thread.sleep(500);                 //Optimize this value, .5 secs for now
+                Thread.sleep(1000);                 //Optimize this value, .5 secs for now
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }            
@@ -90,6 +90,11 @@ public class CXIdentifier {
             String rxString;
             
             if(event.isRXCHAR()){//If data is available
+                try {
+                    Thread.sleep(500);                 //Optimize this value, .5 secs for now
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
                 if(event.getEventValue() == 65){//Check bytes count in the input buffer
                     try {
                         String buffer = serialPort.readString(65);

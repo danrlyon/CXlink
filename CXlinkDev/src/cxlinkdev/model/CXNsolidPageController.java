@@ -8,6 +8,7 @@ package cxlinkdev.model;
 //import cxlinkdev.model.CXCom;
 //import cxlinkdev.model.CXlinkDev;
 //import cxlinkdev.model.ScreensController;
+import static cxlinkdev.model.CXlinkDev.selectedPort;
 import static cxlinkdev.model.CXlinkDev.space;
 import java.io.File;
 import java.io.IOException;
@@ -101,6 +102,7 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     private String cxCurrentValues;
     private String cxDataLogger;
     private String test;
+    private String portName;
     
     final static byte one   = (byte) 0b00000001;
     final static byte two   = (byte) 0b00000010;
@@ -126,7 +128,13 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         
         //this.currentValuesBorderPane.setOpacity(1);
         this.dataLoggerBorderPane.setOpacity(0);
-        this.newSettingsBorderPane.setOpacity(0);        
+        this.newSettingsBorderPane.setOpacity(0);
+        try {
+            this.cxCom = new CXCom();
+            this.cxCom.setBaudRate(19200);
+        } catch (SerialPortException ex) {
+            Logger.getLogger(CXNsolidPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -136,6 +144,10 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     @Override
     public void setScreenParent(ScreensController screenParent){
         myController = screenParent;        
+    }
+    
+    public void setPortName(String newPort){
+        this.portName = newPort;
     }
     
     @FXML
@@ -190,61 +202,75 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         String menuState;
         byte menuStateByte = (byte) 0b111111111;
         
-        
-        this.cxCom.setStatus(1);
-        try {
-            this.cxCom.portCheck();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(CXPageController.class.getName()).log(Level.SEVERE, null, ex);
+        this.cxCom.setCXCurrentValues();
+        int i = 0;
+        while ( this.cxCurrentValues==null && i < 100 )    {
+            this.cxCurrentValues = this.cxCom.getCXCurrentValue();
+            try {
+                Thread.sleep(100);                 //Optimize this value, .5 secs for now
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            i++;
         }
-        //this.cxCom.printStatusCX(space,cxCom.getPortName());        
-       // this.cxCurrentValues = this.cxCom.getCXCurrentValues(cxCom.getPortName());
-        //this.cxDataLogger = this.cxCom.getCXDataLoggerValues("!", this.cxCom.getPortName());
-        //System.out.println(this.cxCom.getDataLoggerValues());
         
-        //Set the TextFields to the most current data
+        
+        this.cxCom.setStatus(1);      
+        this.cxCom.setCXDataLoggerValues();
+        i = 0;
+        while ( this.cxDataLogger==null && i < 100 )    {
+            this.cxDataLogger = this.cxCom.getCXDataLoggerValues();
+            try {
+                Thread.sleep(100);                 //Optimize this value, .5 secs for now
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            i++;
+        }
+        
+        //*Set the TextFields to the most current data
         //Set current battery voltage
-        batteryVoltage = (Float.parseFloat(this.cxCurrentValues.substring(13, 16)));
-        batteryVoltage = (float) ((batteryVoltage*0.032)+9);
+        batteryVoltage = (Float.parseFloat(this.cxCurrentValues.substring(53, 58)));
+        batteryVoltage = (float) (batteryVoltage*0.001);
         this.currentBatteryVoltage.setText(Float.toString(batteryVoltage));
         
         //this.currentBatteryVoltage.setText(this.cxCurrentValues.substring(13, 15) +"."+ this.cxCurrentValues.substring(15, 16));
         //Set current SOC values, (first MENUSTATE is needed
-        menuState = (this.cxDataLogger.substring(40,42));
-        menuStateByte = CXCom.hexStringToByte(menuState);
-//        System.out.println(menuState);
-        System.out.println(menuStateByte);
-//        System.out.println(menuStateInt[1]);
-        
-        if ( "1".equals(this.cxCurrentValues.substring(5,6)) ){
-            this.currentStateOfCharge.setText(this.cxCurrentValues.substring(5, 8));
-        } else this.currentStateOfCharge.setText(this.cxCurrentValues.substring(6, 8));
-        //Set current charge current
-        if ( "00".equals(this.cxCurrentValues.substring(59, 61)) )  {
-            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(61, 62));
-        }else if ( "0".equals(this.cxCurrentValues.substring(59, 60)) ) {
-            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(60, 62));
-        }else this.currentChargeCurrent.setText(this.cxCurrentValues.substring(59, 62));
-        //Set current load current
-        if ( "00".equals(this.cxCurrentValues.substring(25, 27)) )  {
-            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(27, 28));
-        }else if ( "0".equals(this.cxCurrentValues.substring(25, 26)) ) {
-            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(26, 28));
-        }else this.currentLoadCurrent.setText(this.cxCurrentValues.substring(25, 28));
-        //Set current today's energy
-        this.currentTodaysEnergy.setText("NA");
-        //Set Battery Charging State
-        batteryChargingStateString = this.cxCurrentValues.substring(21, 24);
-        batteryChargingState = (int) Integer.valueOf(batteryChargingStateString);
-        batteryChargingStateByte = (byte) batteryChargingState;
-        if ( (batteryChargingState & 1) == 1 ){
-            this.currentBatteryChargingState.setText("BOOST");
-        } else if ( (batteryChargingState & 2) == 2 ) {
-            this.currentBatteryChargingState.setText("EQUALIZE");
-        } else {
-            this.currentBatteryChargingState.setText("FLOAT");    
-        }
-        
+//        menuState = (this.cxDataLogger.substring(40,42));
+//        menuStateByte = CXCom.hexStringToByte(menuState);
+////        System.out.println(menuState);
+//        System.out.println(menuStateByte);
+////        System.out.println(menuStateInt[1]);
+//        
+//        if ( "1".equals(this.cxCurrentValues.substring(5,6)) ){
+//            this.currentStateOfCharge.setText(this.cxCurrentValues.substring(5, 8));
+//        } else this.currentStateOfCharge.setText(this.cxCurrentValues.substring(6, 8));
+//        //Set current charge current
+//        if ( "00".equals(this.cxCurrentValues.substring(59, 61)) )  {
+//            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(61, 62));
+//        }else if ( "0".equals(this.cxCurrentValues.substring(59, 60)) ) {
+//            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(60, 62));
+//        }else this.currentChargeCurrent.setText(this.cxCurrentValues.substring(59, 62));
+//        //Set current load current
+//        if ( "00".equals(this.cxCurrentValues.substring(25, 27)) )  {
+//            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(27, 28));
+//        }else if ( "0".equals(this.cxCurrentValues.substring(25, 26)) ) {
+//            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(26, 28));
+//        }else this.currentLoadCurrent.setText(this.cxCurrentValues.substring(25, 28));
+//        //Set current today's energy
+//        this.currentTodaysEnergy.setText("NA");
+//        //Set Battery Charging State
+//        batteryChargingStateString = this.cxCurrentValues.substring(21, 24);
+//        batteryChargingState = (int) Integer.valueOf(batteryChargingStateString);
+//        batteryChargingStateByte = (byte) batteryChargingState;
+//        if ( (batteryChargingState & 1) == 1 ){
+//            this.currentBatteryChargingState.setText("BOOST");
+//        } else if ( (batteryChargingState & 2) == 2 ) {
+//            this.currentBatteryChargingState.setText("EQUALIZE");
+//        } else {
+//            this.currentBatteryChargingState.setText("FLOAT");    
+//        }
+//        
     } 
 
     @FXML
