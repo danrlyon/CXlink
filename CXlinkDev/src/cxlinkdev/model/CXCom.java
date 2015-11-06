@@ -66,31 +66,51 @@ public final class CXCom {
     
     public void setCXDataLoggerValues(  ) {
         serialPort = new SerialPort(selectedPort);
-        cxDataLogger = null;
+        cxDataLogger = "";
         try {
             serialPort.openPort();//Open port
             serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
             int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
-            //serialPort.setEventsMask(mask);//Set mask
-            //serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
+            serialPort.setEventsMask(mask);//Set mask
+            serialPort.addEventListener(new SerialPortDataLogger());//Add SerialPortEventListener
             serialPort.writeString("!");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+            int i = 0;
+            //checks if cxDataLogger is full or we are out of time
+            // Backseat child function "Are we there yet?"
+            switch (controllerType) {
+                case "CXNsolid":
+                    while ( cxDataLogger.length()<6147 && i<100 )    {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        i++;
+                    }   break;
+                case "CX":
+                    while ( cxDataLogger.length()<769 && i<100 )    {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        i++;        
+                    }   break;
+                case "CXN":
+                    while ( cxDataLogger.length()<769 && i<100 )    {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        i++;        
+                    }   break;
             }
-            try {
-                cxDataLogger = serialPort.readString(4000, 10000);  //Needs to be optimized
-            } catch (SerialPortTimeoutException ex) {
-                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            serialPort.closePort();
+            if ( serialPort.isOpened() ) serialPort.closePort();
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
-        }
-        
+        }        
         System.out.println(cxDataLogger);
     }
     
@@ -106,15 +126,18 @@ public final class CXCom {
             serialPort.openPort();//Open port
             serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
             int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
-            //serialPort.setEventsMask(mask);//Set mask
-            //serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
+            serialPort.setEventsMask(mask);//Set mask
+            serialPort.addEventListener(new SerialPortCurrentValues());//Add SerialPortEventListener
             serialPort.writeString(" ");
-            try {
-                cxCurrentStatus = serialPort.readString(96, 1000);
-            } catch (SerialPortTimeoutException ex) {
-                Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+            int i = 0;
+            while ( cxCurrentStatus == null && i<100 )    {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(CXCom.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                i++;
             }
-            serialPort.closePort();
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
@@ -170,7 +193,7 @@ public final class CXCom {
      * those that we put in the mask. In this case the arrival of the data and change the 
      * status lines CTS and DSR
      */
-    static class SerialPortReader implements SerialPortEventListener {
+    static class SerialPortCurrentValues implements SerialPortEventListener {
 
         @Override
         public void serialEvent(SerialPortEvent event) {
@@ -209,6 +232,27 @@ public final class CXCom {
                     }
                 }               
             }else ;
+        
+        }
+    }
+    static class SerialPortDataLogger implements SerialPortEventListener {
+
+        @Override
+        public void serialEvent(SerialPortEvent event) {
+            String rxString;
+            if(event.isRXCHAR()){//If data is available
+                    try {    
+                        String buffer = serialPort.readString(event.getEventValue());
+                        //System.out.println(buffer + " string read from serial port \n");
+                        if ( cxDataLogger == null)  {
+                            cxDataLogger = buffer;
+                        } else cxDataLogger += buffer;
+                        //serialPort.closePort();
+                    }
+                    catch (SerialPortException ex) {
+                        System.out.println(ex);
+                    }
+                } else  System.out.println("Some other serialPort event") ;
         
         }
     }
