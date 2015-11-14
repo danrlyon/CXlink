@@ -110,8 +110,7 @@ public final class CXCom {
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
-        }        
-        System.out.println(cxDataLogger);
+        }
     }
     
     public void setBaudRate(int baudTemp)   {
@@ -141,36 +140,13 @@ public final class CXCom {
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
-        }       
-        System.out.println(cxCurrentStatus);
+        }        
     }
     
     public String getCXCurrentValue()   {
         return cxCurrentStatus;
     }
-    
-    
-    
-//    public String getCXDataLoggerValues(String args, String portNameTemp)    {
-//        System.out.println(portNameTemp);
-//        SerialPort serialPort;
-//        serialPort = new SerialPort(portNameTemp);
-//        try {
-//            serialPort.openPort();//Open port
-//            if ( serialPort.setParams(9600, 8, 1, 0) == false ) System.out.println ("Baudcheck false");//Set params
-//            else this.portName[this.portArrayPosition] = portNameTemp;
-//            /*Needs to be able to handle multiple ports*/
-//            serialPort.writeBytes("!".getBytes());       //(args.getBytes());//Write data to port
-//            this.cxDataLogger = serialPort.readString(767);
-//            serialPort.closePort();
-//        }
-//        catch (SerialPortException ex) {
-//            System.out.println(ex);
-//        }
-//                    
-//        return this.cxDataLogger;
-//    }   
-    
+
     public static byte hexStringToByte(String s) {
         int len = s.length();
         byte data = (byte) 0b11111111;
@@ -182,8 +158,7 @@ public final class CXCom {
         }else   {
             System.out.println("Incorrect data format");
             data= (byte) 0b11111111;
-        }
-            
+        }            
         return data;
     } 
     
