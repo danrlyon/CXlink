@@ -28,7 +28,9 @@ public class CXNsolidDataDecryptor {
     private byte currentYear;                   //
     private short inverter;                     // Example inverter = 24 AND 700W inverter => 24*70 =1680Wh 
     private int[][] dayData = new int[31][15];  // Day will be first argument, and second will denote the data (31days by 19values)
+    private String[][] dayDecoded = new String[31][15];
     private int[][] monthData = new int[24][15];// Month will be first argument, and second will denote the data (24months by 19values)
+    private String[][] monthDecoded = new String [24][15];
     
     /*Current Values information*/
     private int loadCurrentDigits;              // Load current in digits ?what does in digits mean?
@@ -50,6 +52,11 @@ public class CXNsolidDataDecryptor {
     private float pwm;                            // 0 to 7812. Divide by 7812 to get duty cycle
     private int minutesSinceReset;
 
+    //Variables to store settings
+    private int lvdVoltageDependentDC;
+    private int lvdVoltageDependentAC;
+    private int lvdMode;
+    
     CXCom cxCom;
     
     private String cxCurrentValues;
@@ -89,7 +96,6 @@ public class CXNsolidDataDecryptor {
             }
             i++;
         }
-        //System.out.println(this.cxDataLogger+"/n"+this.cxCurrentValues);
     }        
     
     public String getCurrentValues()  {
@@ -103,7 +109,7 @@ public class CXNsolidDataDecryptor {
     public void decryptCurrentValues()  {
         // Splits up the values, then stores each in it's own variable
         String[] splitCurrentValues = this.cxCurrentValues.split(";");
-        //System.out.println(splitCurrentValues[0]);
+        int i;        
         this.loadCurrentDigits = Integer.parseInt(splitCurrentValues[0].trim());
         this.loadCurrent = Float.parseFloat(splitCurrentValues[1]);
         this.loadCurrent *= 0.01;
@@ -133,88 +139,130 @@ public class CXNsolidDataDecryptor {
         //Parse and store data in a readable format
         String replace = this.cxDataLogger.replace("!", " ");
         String trim = replace.trim();
-        String[] splitDataLogger = trim.split(";");
-        System.out.println(Arrays.toString(splitDataLogger));
+        String[] splitDataLogger = trim.split(";");        
+        int i;        
         this.numberLVDDays = Integer.parseInt("0000"
-                +splitDataLogger[0]+splitDataLogger[1], 16);
+                +splitDataLogger[128]+splitDataLogger[129], 16);
         this.numberMonthsNoFullCharge = Integer.parseInt("000000"
-                +splitDataLogger[2], 16);
-        this.sumMorningSOCs = Integer.parseInt("0000"+splitDataLogger[4]
-                +splitDataLogger[5], 16);
-        this.ahCharge = Long.parseLong(splitDataLogger[6]+splitDataLogger[7]
-                +splitDataLogger[8]+splitDataLogger[9], 16);
-        this.ahLoad = Long.parseLong(splitDataLogger[10]+splitDataLogger[11]
-                +splitDataLogger[12]+splitDataLogger[13], 16);
-        this.totalDaysActive = Integer.parseInt("0000"+splitDataLogger[14]
-                +splitDataLogger[15]);
-        int i;
+                +splitDataLogger[130], 16);
+        this.sumMorningSOCs = Integer.parseInt("0000"+splitDataLogger[131]
+                +splitDataLogger[132], 16);
+        this.ahCharge = Long.parseLong(splitDataLogger[133]+splitDataLogger[134]
+                +splitDataLogger[135]+splitDataLogger[136], 16);
+        this.ahLoad = Long.parseLong(splitDataLogger[137]+splitDataLogger[138]
+                +splitDataLogger[139]+splitDataLogger[140], 16);
+        this.totalDaysActive = Integer.parseInt("00"+splitDataLogger[141]
+                +splitDataLogger[142]+splitDataLogger[143], 16);
+        //Daily datalogger values to be deciphered
         for ( i=0;i<31;i++ )    {
-            this.dayData[i][0] = Integer.parseInt("0000"+splitDataLogger[16+(i*19)]
-                    +splitDataLogger[17+(i*19)], 16);
+            //Loads Date into dayDecoded string array
+            this.dayData[i][0] = Integer.parseInt("0000"+splitDataLogger[144+(i*19)]
+                    +splitDataLogger[145+(i*19)], 16);
+            this.currentYear = (byte) (this.dayData[i][0]&127);
+            this.currentMonth = (byte) ((this.dayData[i][0]>>7)&15);
+            this.currentDay = (byte) ((this.dayData[i][0]>>11&31));
+            this.dayDecoded[i][0]= ("20"+Byte.toString(this.currentYear)+"-"
+                    +Byte.toString(this.currentMonth)+"-"
+                    +Byte.toString(this.currentDay));
+            System.out.println(this.dayDecoded[i][0]);
+            //Loads Inverter factor into dayDecoded
+            //multiply this by inverter power to get Watthours
             this.dayData[i][1] = Integer.parseInt("000000"
-                    +splitDataLogger[18+(i*19)], 16);
+                    +splitDataLogger[146+(i*19)], 16);
+            this.dayDecoded[i][1] = Float.toString((float) ((this.dayData[i][1])*0.1));
+            //Load Max Voltage
             this.dayData[i][2] = Integer.parseInt("000000"
-                    +splitDataLogger[19+(i*19)], 16);
+                    +splitDataLogger[147+(i*19)], 16);
+            this.dayDecoded[i][2] = Float.toString((float) (this.dayData[i][2]*0.1));
+            //Load min voltage
             this.dayData[i][3] = Integer.parseInt("000000"
-                    +splitDataLogger[20+(i*19)], 16);
-            this.dayData[i][4] = Integer.parseInt("0000"+splitDataLogger[21+(i*19)]
-                    +splitDataLogger[22+(i*19)], 16);
-            this.dayData[i][5] = Integer.parseInt("0000"+splitDataLogger[23+(i*19)]
-                    +splitDataLogger[24+(i*19)], 16);
+                    +splitDataLogger[148+(i*19)], 16);
+            this.dayDecoded[i][3] = Float.toString((float) (this.dayData[i][3]*0.1));
+            //Load AHin
+            this.dayData[i][4] = Integer.parseInt("0000"+splitDataLogger[149+(i*19)]
+                    +splitDataLogger[150+(i*19)], 16);
+            this.dayDecoded[i][4] = Float.toString((float) (this.dayData[i][4]*0.1));
+            //Load AHout
+            this.dayData[i][5] = Integer.parseInt("0000"+splitDataLogger[151+(i*19)]
+                    +splitDataLogger[152+(i*19)], 16);
+            this.dayDecoded[i][5] = Float.toString((float) (this.dayData[i][5]*0.1));
+            //Load Max PV voltage
             this.dayData[i][6] = Integer.parseInt("000000"
-                    +splitDataLogger[25+(i*19)], 16);
+                    +splitDataLogger[153+(i*19)], 16);
+            this.dayDecoded[i][6] = Float.toString((float) (this.dayData[i][6]*0.5));
+            //Load Min PV voltage
             this.dayData[i][7] = Integer.parseInt("000000"
-                    +splitDataLogger[26+(i*19)], 16);
+                    +splitDataLogger[154+(i*19)], 16);
+            this.dayDecoded[i][7] = Float.toString((float) (this.dayData[i][7]*0.5));
+            //Load max load current
             this.dayData[i][8] = Integer.parseInt("000000"
-                    +splitDataLogger[27+(i*19)], 16);
+                    +splitDataLogger[155+(i*19)], 16);
+            this.dayDecoded[i][8] = Float.toString((float) (this.dayData[i][8]*0.5));
+            //Load max charge current
             this.dayData[i][9] = Integer.parseInt("000000"
-                    +splitDataLogger[28+(i*19)], 16);
+                    +splitDataLogger[156+(i*19)], 16);
+            this.dayDecoded[i][9] = Float.toString((float) (this.dayData[i][9]*0.5));
+            //Load morning SOC percent
             this.dayData[i][10] = Integer.parseInt("000000"
-                    +splitDataLogger[29+(i*19)], 16);
+                    +splitDataLogger[157+(i*19)], 16);
+            this.dayDecoded[i][10] = (Float.toString((float) (this.dayData[i][10]*6.6))+"%");
+            //Load external temperature max
             this.dayData[i][11] = Integer.parseInt("000000"
-                    +splitDataLogger[30+(i*19)], 16);
+                    +splitDataLogger[158+(i*19)], 16);
+            this.dayDecoded[i][11] = (Byte.toString((byte) (this.dayData[i][11]))+"°C");            
+            //Load external temperature min
             this.dayData[i][12] = Integer.parseInt("000000"
-                    +splitDataLogger[31+(i*19)], 16);
+                    +splitDataLogger[159+(i*19)], 16);
+            this.dayDecoded[i][12] = (Byte.toString((byte) (this.dayData[i][12]))+"°C");            
+            //Load nightlength in minutes
             this.dayData[i][13] = Integer.parseInt("000000"
-                    +splitDataLogger[32+(i*19)], 16);
-            this.dayData[i][14] = Integer.parseInt("0000"+splitDataLogger[33+(i*19)]
-                    +splitDataLogger[34+(i*19)], 16);            
+                    +splitDataLogger[160+(i*19)], 16);
+            this.dayDecoded[i][13] = (Integer.toString(this.dayData[i][13]*6)+" Minutes");
+            //
+            this.dayData[i][14] = Integer.parseInt("0000"+splitDataLogger[161+(i*19)]
+                    +splitDataLogger[162+(i*19)], 16); 
+            this.dayDecoded[i][14] = Integer.toBinaryString(this.dayData[i][14]);
         }
+        //Monthly Datalogger values to be decyphered.
         for ( i=0;i<24;i++ )    {
-            this.monthData[i][0] = Integer.parseInt("0000"+splitDataLogger[605+(i*19)]
-                    +splitDataLogger[606+(i*19)], 16);
+            this.monthData[i][0] = Integer.parseInt("0000"+splitDataLogger[733+(i*19)]
+                    +splitDataLogger[734+(i*19)], 16);
             this.monthData[i][1] = Integer.parseInt("000000"
-                    +splitDataLogger[607+(i*19)], 16);
+                    +splitDataLogger[735+(i*19)], 16);
             this.monthData[i][2] = Integer.parseInt("000000"
-                    +splitDataLogger[608+(i*19)], 16);
+                    +splitDataLogger[736+(i*19)], 16);
             this.monthData[i][3] = Integer.parseInt("000000"
-                    +splitDataLogger[609+(i*19)], 16);
-            this.monthData[i][4] = Integer.parseInt("0000"+splitDataLogger[610+(i*19)]
-                    +splitDataLogger[611+(i*19)], 16);
-            this.monthData[i][5] = Integer.parseInt("0000"+splitDataLogger[612+(i*19)]
-                    +splitDataLogger[613+(i*19)], 16);
+                    +splitDataLogger[737+(i*19)], 16);
+            this.monthData[i][4] = Integer.parseInt("0000"+splitDataLogger[738+(i*19)]
+                    +splitDataLogger[739+(i*19)], 16);
+            this.monthData[i][5] = Integer.parseInt("0000"+splitDataLogger[740+(i*19)]
+                    +splitDataLogger[741+(i*19)], 16);
             this.monthData[i][6] = Integer.parseInt("000000"
-                    +splitDataLogger[614+(i*19)], 16);
+                    +splitDataLogger[742+(i*19)], 16);
             this.monthData[i][7] = Integer.parseInt("000000"
-                    +splitDataLogger[615+(i*19)], 16);
+                    +splitDataLogger[743+(i*19)], 16);
             this.monthData[i][8] = Integer.parseInt("000000"
-                    +splitDataLogger[616+(i*19)], 16);
+                    +splitDataLogger[744+(i*19)], 16);
             this.monthData[i][9] = Integer.parseInt("000000"
-                    +splitDataLogger[617]+(i*19), 16);
+                    +splitDataLogger[745]+(i*19), 16);
             this.monthData[i][10] = Integer.parseInt("000000"
-                    +splitDataLogger[618+(i*19)], 16);
+                    +splitDataLogger[746+(i*19)], 16);
             this.monthData[i][11] = Integer.parseInt("000000"
-                    +splitDataLogger[619+(i*19)], 16);
+                    +splitDataLogger[747+(i*19)], 16);
             this.monthData[i][12] = Integer.parseInt("000000"
-                    +splitDataLogger[620+(i*19)], 16);
+                    +splitDataLogger[748+(i*19)], 16);
             this.monthData[i][13] = Integer.parseInt("000000"
-                    +splitDataLogger[621+(i*19)], 16);
-            this.monthData[i][14] = Integer.parseInt("0000"+splitDataLogger[622+(i*19)]
-                    +splitDataLogger[623+(i*19)], 16);            
+                    +splitDataLogger[749+(i*19)], 16);
+            this.monthData[i][14] = Integer.parseInt("0000"+splitDataLogger[750+(i*19)]
+                    +splitDataLogger[751+(i*19)], 16);            
         }
+        //Decypher settings
+        
+        
         System.out.println(Arrays.toString(dayData[0]));
-        System.out.println(Arrays.toString(monthData[0]));
-    }
+        System.out.println(Arrays.toString(this.dayDecoded[0]));
+//        System.out.println(Arrays.toString(monthData[0]));
+    }    
     
     public static byte hexStringToByte(String s) {
         int len = s.length();

@@ -185,7 +185,7 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         byte menuStateByte = (byte) 0b111111111;
         
         this.solidDecryptor = new CXNsolidDataDecryptor();  
-        //this.solidDecryptor.decryptCurrentValues();
+        this.solidDecryptor.decryptCurrentValues();
         this.solidDecryptor.decryptDataLogger();
     } 
 
