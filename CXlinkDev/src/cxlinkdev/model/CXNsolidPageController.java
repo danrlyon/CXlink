@@ -25,6 +25,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -55,6 +60,12 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     @FXML private Button dataYearButton;
     @FXML private Button settingsControllerButton;
     @FXML private Button settingsLoadButton;
+    @FXML private Button batteryVoltageButton;
+    @FXML private Button ampHoursButton;
+    @FXML private Button pVVoltageButton;
+    @FXML private Button systemCurrentsButton;
+    @FXML private Button morningSOCButton;
+    @FXML private Button temperatureButton;
     
     /*List of TextFields by fx:id*/
     @FXML private TextField currentBatteryVoltage;
@@ -95,13 +106,52 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     @FXML private BorderPane newSettingsBorderPane;
     
     /*List of StackPane by fx:id*/
-    @FXML private StackPane cxPageStackPane;     
+    @FXML private StackPane cxPageStackPane;
+    @FXML private StackPane barChartStackPane;
+    
+    /*List of Line Charts by fx:id*/
+    @FXML private LineChart lineChart;
+    @FXML private BarChart batteryVoltages;
+    @FXML private final BarChart ampHours;
+    @FXML private final BarChart pVVoltages;
+    @FXML private final BarChart systemCurrents;
+    @FXML private final BarChart morningSOC;
+    @FXML private BarChart externalTemp;
+    
     
     ScreensController myController;
     
     private CXNsolidDataDecryptor solidDecryptor;
+    
+    //List of the series' needed for the charts
+    private XYChart.Series dateSeries = new XYChart.Series();
+    private XYChart.Series batteryMinSeries = new XYChart.Series();
+    private XYChart.Series batteryMaxSeries = new XYChart.Series();
+    private XYChart.Series loadAmpHoursSeries = new XYChart.Series();
+    private XYChart.Series chargeAmpHoursSeries = new XYChart.Series();
+    private XYChart.Series pVMinSeries = new XYChart.Series();
+    private XYChart.Series pVMaxSeries = new XYChart.Series();
+    private XYChart.Series loadMaxCurrentSeries = new XYChart.Series();
+    private XYChart.Series chargeMaxCurrentSeries = new XYChart.Series();
+    private XYChart.Series morningSOCSeries = new XYChart.Series();
+    private XYChart.Series minExternalTempSeries = new XYChart.Series();
+    private XYChart.Series maxExternalTempSeries = new XYChart.Series();
+    private XYChart.Series maxLoadCurrentSeries = new XYChart.Series();
+    private XYChart.Series maxChargeCurrentSeries = new XYChart.Series();
+    
+    private final CategoryAxis xAxis = new CategoryAxis();
+    private final NumberAxis yAxis = new NumberAxis();
 
-    public CXNsolidPageController() {
+    public CXNsolidPageController() {        
+        
+        //Set up all of the charts
+        
+        this.ampHours = new BarChart<>(xAxis,yAxis);
+        this.pVVoltages = new BarChart<>(xAxis,yAxis);
+        this.systemCurrents = new BarChart<>(xAxis,yAxis);
+        this.morningSOC = new BarChart<>(xAxis,yAxis);
+        this.externalTemp = new BarChart<>(xAxis,yAxis);
+        this.xAxis.setLabel("Date");
         System.out.println("initialized CXNsolid page controller");
     }
 
@@ -165,8 +215,67 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         this.currentSystemReadings.setStyle("-fx-font-weight:normal");
         this.currentSystemSettings.setStyle("-fx-font-weight:bold");        
         //this.refreshCurrentValues(event);
+    }    
+    
+    @FXML
+    private void handleBatteryVoltageSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);
+        this.batteryVoltages.getData().addAll(this.batteryMinSeries, this.batteryMaxSeries);
+        this.batteryVoltages.setTitle("Battery Voltages");        
+        this.yAxis.setLabel("Volts");        
+        this.xAxis.setLabel("Date");        
     }
     
+    @FXML
+    private void handleAmpHourSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);
+        this.batteryVoltages.getData().addAll(this.chargeAmpHoursSeries, this.loadAmpHoursSeries);
+        this.batteryVoltages.setTitle("Amp Hours In and Out");        
+        this.yAxis.setLabel("Amp Hours");        
+        this.xAxis.setLabel("Date");
+    }
+    
+    @FXML
+    private void handlePVVoltageSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);  
+        this.batteryVoltages.getData().addAll(this.pVMinSeries, this.pVMinSeries);
+        this.batteryVoltages.setTitle("Solar Array Max and Min Voltages");        
+        this.yAxis.setLabel("Volts");
+        this.xAxis.setLabel("Date");
+    }
+    
+    @FXML
+    private void handleSystemCurrentsSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);
+        this.batteryVoltages.getData().addAll(this.chargeMaxCurrentSeries, this.loadMaxCurrentSeries);
+        this.batteryVoltages.setTitle("Maximum Currents In and Out");        
+        this.yAxis.setLabel("Amps");
+        this.xAxis.setLabel("Date");
+    }
+    
+    @FXML
+    private void handleSOCSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);
+        this.batteryVoltages.getData().addAll(this.morningSOCSeries);
+        this.batteryVoltages.setTitle("State of Charge Measured Shortly After Dawn");        
+        this.yAxis.setLabel("Percent %");
+        this.xAxis.setLabel("Date");
+    }
+    
+    @FXML
+    private void handleTemperatureSelect(ActionEvent event) throws InterruptedException {
+        this.batteryVoltages.getData().remove(0,2);
+        Thread.sleep(3000);
+        this.batteryVoltages.getData().addAll(this.pVMinSeries, this.pVMinSeries);
+        this.batteryVoltages.setTitle("Temperature Measured with External Sensor");        
+        this.yAxis.setLabel("°C");
+        this.xAxis.setLabel("Date");
+    }
     
     @FXML
     private void refreshCurrentValues(ActionEvent event) throws SerialPortException, UnsupportedEncodingException {
@@ -183,10 +292,56 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         int temperature = 0;
         String menuState;
         byte menuStateByte = (byte) 0b111111111;
+        String[][] dayData = new String[31][15];
+        String[][] monthData = new String[24][15];
         
         this.solidDecryptor = new CXNsolidDataDecryptor();  
         this.solidDecryptor.decryptCurrentValues();
         this.solidDecryptor.decryptDataLogger();
+        
+        //Load the DataLogger Charts
+        int i;
+        int j;
+        dayData = this.solidDecryptor.getDayDecoded();
+        monthData = this.solidDecryptor.getMonthDecoded();
+        for (i=0;i<31;i++)  {
+           if (!dayData[i][0].equals("200-0-0"))    {
+                this.batteryMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][2])));
+                this.batteryMaxSeries.setName("Max");
+                this.batteryMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][3])));
+                this.batteryMinSeries.setName("Min");
+                this.chargeAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][4])));
+                this.chargeAmpHoursSeries.setName("Charging");
+                this.loadAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][5])));
+                this.loadAmpHoursSeries.setName("Discharging");
+                this.pVMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][6])));
+                this.pVMaxSeries.setName("Max");
+                this.pVMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][7])));
+                this.pVMinSeries.setName("Min");
+                this.maxLoadCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][8])));
+                this.maxLoadCurrentSeries.setName("Discharge");
+                this.maxChargeCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][9])));
+                this.maxChargeCurrentSeries.setName("Charge");
+                this.morningSOCSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][10].replace("%", ""))));
+                this.morningSOCSeries.setName("State of Charge");
+                this.maxExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][11].replace("°C",""))));
+                this.maxExternalTempSeries.setName("Max");
+                this.minExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][12].replace("°C",""))));
+                this.minExternalTempSeries.setName("Min");
+            }
+        }
+        //Still need to convert monthData
+        this.batteryVoltages = new BarChart<>(this.xAxis,this.yAxis);
+        this.batteryVoltages.getData().addAll(this.batteryMinSeries, this.batteryMaxSeries);
+        this.batteryVoltages.setTitle("Battery Voltages");        
+        this.yAxis.setLabel("Volts");
+        this.yAxis.setAnimated(true);
+        this.xAxis.setLabel("Date");
+        this.xAxis.setAnimated(true);
+        
+        
+        
+        
     } 
 
     @FXML
@@ -220,6 +375,7 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         this.dataLoggerButton.setStyle("-fx-font-weight:bold");
         this.newSettingsButton.setStyle("-fx-font-weight:normal");
         
+        
         //Set each borderPane to proper opacity, then remove and reload in the proper order
         //Optimize in the future
         this.currentValuesBorderPane.setOpacity(0);
@@ -227,7 +383,13 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         this.dataLoggerBorderPane.setOpacity(1);
         this.cxPageStackPane.getChildren().remove(0, 2);
         this.cxPageStackPane.getChildren().setAll(this.currentValuesBorderPane, this.newSettingsBorderPane, this.dataLoggerBorderPane);
-        
+        //Set week chart as default
+        int i=0;
+        if( !this.barChartStackPane.getChildren().isEmpty() ) {
+            this.barChartStackPane.getChildren().removeAll();
+        }         
+        this.barChartStackPane.getChildren().setAll(
+                this.batteryVoltages);
     }
     
     @FXML
