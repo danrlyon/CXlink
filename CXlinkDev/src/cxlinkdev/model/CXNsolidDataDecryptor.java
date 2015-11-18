@@ -106,6 +106,48 @@ public class CXNsolidDataDecryptor {
         return this.cxDataLogger;
     }
     
+    public int numberLVDDays(){return this.numberLVDDays;}//Number of days with LVD (2bytes)
+    
+    public int getNumberMonthsNoFullCharge(){return this.numberMonthsNoFullCharge;}     //Number of months without a full charge (1byte) ?Consecutive?
+    public int getSumMorningSOCs(){return this.sumMorningSOCs;}                 //Sum of SOCs in the morning (2bytes) ?all SOCs?
+    public long getAhCharge(){return this.ahCharge;}                      //Total amp hours charging  (4bytes)
+    public long getAhLoad(){return this.ahLoad;}                        //Total load amp hours (4bytes)
+    public int getTotalDaysActive(){return this.totalDaysActive;}                //Total number of days (2bytes) ?Days on, when does reset happen?consec?
+    public long getDateBytes(){return this.dateBytes;}                     //Date, decrypted into variables below
+    public byte getCurrentDay(){return this.currentDay;}                    //Day, month, and year pulled from datalogger
+    public byte getCurrentMonth(){return this.currentMonth;}                  //  b0-b6 = year, b7-b10
+    public byte getCurrentYear(){return this.currentYear;}                   //
+    public short getInverter(){return this.inverter;}                     // Example inverter = 24 AND 700W inverter => 24*70 =1680Wh 
+    public int[][] getDayData(){return this.dayData;}  // Day will be first argument, and second will denote the data (31days by 19values)
+    public String[][] getDayDecoded(){return this.dayDecoded;}
+    public int[][] getMonthData(){return this.monthData;}// Month will be first argument, and second will denote the data (24months by 19values)
+    public String[][] getMonthDecoded(){return this.monthDecoded;}
+    
+    /*Current Values information*/
+    public int getLoadCurrentDigits(){return this.loadCurrentDigits;}              // Load current in digits ?what does in digits mean?
+    public float getLoadCurrent(){return this.loadCurrent;}                    // Load current in 10mA
+    public int getChargeCurrentDigits(){return this.chargeCurrentDigits;}            // Charge current in digits
+    public float chargeCurrent(){return this.chargeCurrent;}                  // Charge current in 10mA
+    public int internalTempDigits(){return this.internalTempDigits;}             // Internal temperature in digits
+    public int batteryVoltageDigits(){return this.batteryVoltageDigits;}           // Battery voltage in digits (with current) ?huh?
+    public int firmwareVersion(){return this.firmwareVersion;}                // Firmware version
+    public int loadState(){return this.loadState;}                      // Load state, TBD
+    public int inverterState(){return this.inverterState;}                  // Inverter state
+    public int chargeState(){return this.chargeState;}                    // Charge state
+    public int externalTempError(){return this.externalTempError;}              // External temperature error: 16 ?huh?
+    public float batteryVoltage(){return this.batteryVoltage;}                 // Battery voltage in mV
+    public float endOfChargeVoltage(){return this.endOfChargeVoltage;}             // End of charge voltage in mV
+    public int socPercent(){return this.socPercent;}                     // State of charge percentage
+    public int internalTemp(){return this.internalTemp;}                   // Internal temperature °C
+    public int externalTemp(){return this.externalTemp;}                   // External temperature °C
+    public float pwm(){return this.pwm;}                            // 0 to 7812. Divide by 7812 to get duty cycle
+    public int minutesSinceReset(){return this.minutesSinceReset;}
+
+    //Variables to store settings
+//    public int lvdVoltageDependentDC(){;}
+//    public int lvdVoltageDependentAC(){;}
+//    public int lvdMode(){;}
+    
     public void decryptCurrentValues()  {
         // Splits up the values, then stores each in it's own variable
         String[] splitCurrentValues = this.cxCurrentValues.split(";");
