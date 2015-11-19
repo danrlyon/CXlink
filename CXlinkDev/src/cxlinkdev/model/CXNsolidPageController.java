@@ -17,9 +17,15 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,12 +39,14 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import jssc.SerialPortException;
 /**
  * FXML Controller class
@@ -109,9 +117,12 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     @FXML private StackPane cxPageStackPane;
     @FXML private StackPane barChartStackPane;
     
+    /*List of ScrollPane by fx:id*/
+    @FXML private ScrollPane barChartScrollPane;
+    
     /*List of Line Charts by fx:id*/
     @FXML private LineChart lineChart;
-    @FXML private BarChart batteryVoltages;
+    @FXML private final BarChart<String, Number> batteryVoltages;
     @FXML private final BarChart ampHours;
     @FXML private final BarChart pVVoltages;
     @FXML private final BarChart systemCurrents;
@@ -124,20 +135,21 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     private CXNsolidDataDecryptor solidDecryptor;
     
     //List of the series' needed for the charts
-    private XYChart.Series dateSeries = new XYChart.Series();
-    private XYChart.Series batteryMinSeries = new XYChart.Series();
-    private XYChart.Series batteryMaxSeries = new XYChart.Series();
-    private XYChart.Series loadAmpHoursSeries = new XYChart.Series();
-    private XYChart.Series chargeAmpHoursSeries = new XYChart.Series();
-    private XYChart.Series pVMinSeries = new XYChart.Series();
-    private XYChart.Series pVMaxSeries = new XYChart.Series();
-    private XYChart.Series loadMaxCurrentSeries = new XYChart.Series();
-    private XYChart.Series chargeMaxCurrentSeries = new XYChart.Series();
-    private XYChart.Series morningSOCSeries = new XYChart.Series();
-    private XYChart.Series minExternalTempSeries = new XYChart.Series();
-    private XYChart.Series maxExternalTempSeries = new XYChart.Series();
-    private XYChart.Series maxLoadCurrentSeries = new XYChart.Series();
-    private XYChart.Series maxChargeCurrentSeries = new XYChart.Series();
+    private final XYChart.Series displayedSeries1 = new XYChart.Series();
+    private final XYChart.Series displayedSeries2 = new XYChart.Series();
+    private final XYChart.Series batteryMinSeries = new XYChart.Series();
+    private final XYChart.Series batteryMaxSeries = new XYChart.Series();
+    private final XYChart.Series loadAmpHoursSeries = new XYChart.Series();
+    private final XYChart.Series chargeAmpHoursSeries = new XYChart.Series();
+    private final XYChart.Series pVMinSeries = new XYChart.Series();
+    private final XYChart.Series pVMaxSeries = new XYChart.Series();
+    private final XYChart.Series loadMaxCurrentSeries = new XYChart.Series();
+    private final XYChart.Series chargeMaxCurrentSeries = new XYChart.Series();
+    private final XYChart.Series morningSOCSeries = new XYChart.Series();
+    private final XYChart.Series minExternalTempSeries = new XYChart.Series();
+    private final XYChart.Series maxExternalTempSeries = new XYChart.Series();
+    private final XYChart.Series maxLoadCurrentSeries = new XYChart.Series();
+    private final XYChart.Series maxChargeCurrentSeries = new XYChart.Series();
     
     private final CategoryAxis xAxis = new CategoryAxis();
     private final NumberAxis yAxis = new NumberAxis();
@@ -151,6 +163,13 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         this.systemCurrents = new BarChart<>(xAxis,yAxis);
         this.morningSOC = new BarChart<>(xAxis,yAxis);
         this.externalTemp = new BarChart<>(xAxis,yAxis);
+        this.batteryVoltages = new BarChart<String, Number>(xAxis,yAxis);
+//        this.batteryVoltages.addEventHandler(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent e) {
+//                System.out.println("Action Event BarChart!");
+//            }
+//        });
         this.xAxis.setLabel("Date");
         System.out.println("initialized CXNsolid page controller");
     }
@@ -218,63 +237,219 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
     }    
     
     @FXML
-    private void handleBatteryVoltageSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);
-        this.batteryVoltages.getData().addAll(this.batteryMinSeries, this.batteryMaxSeries);
-        this.batteryVoltages.setTitle("Battery Voltages");        
-        this.yAxis.setLabel("Volts");        
-        this.xAxis.setLabel("Date");        
+    private void handleBatteryVoltageSelect(ActionEvent event) throws InterruptedException {        
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;
+            this.batteryVoltages.setTitle("Battery Voltages");        
+            this.yAxis.setLabel("V");
+            if (this.batteryVoltages.getData().size()==1) this.batteryVoltages.getData().add(this.displayedSeries2);
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][2]));
+                        i++;                        
+                    }
+                    series.setName("MAX");                  
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][3]));
+                        i++;
+                    }
+                    series.setName("MIN");
+                }else if(seriesCount>1)     {
+                    System.out.println("Too many series!");
+                }
+                seriesCount++;
+            }
+        }));
+        tl.setCycleCount(1);
+        tl.play();     
     }
     
     @FXML
     private void handleAmpHourSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);
-        this.batteryVoltages.getData().addAll(this.chargeAmpHoursSeries, this.loadAmpHoursSeries);
-        this.batteryVoltages.setTitle("Amp Hours In and Out");        
-        this.yAxis.setLabel("Amp Hours");        
-        this.xAxis.setLabel("Date");
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;
+            this.batteryVoltages.setTitle("Amp Hours In and Out");        
+            this.yAxis.setLabel("Ah");
+            if (this.batteryVoltages.getData().size()==1) this.batteryVoltages.getData().add(this.displayedSeries2);
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][4]));
+                        i++;                        
+                    }
+                    series.setName("Charged");
+                    
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][5]));
+                        i++;
+                    }
+                    series.setName("Discharged");
+                }else if(seriesCount>1) System.out.println("Too many series!");
+                seriesCount++;
+            }
+        }));
+        tl.setCycleCount(1);
+        tl.play();       
     }
     
     @FXML
     private void handlePVVoltageSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);  
-        this.batteryVoltages.getData().addAll(this.pVMinSeries, this.pVMinSeries);
-        this.batteryVoltages.setTitle("Solar Array Max and Min Voltages");        
-        this.yAxis.setLabel("Volts");
-        this.xAxis.setLabel("Date");
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;
+            this.batteryVoltages.setTitle("Solar Array Voltages");        
+            this.yAxis.setLabel("V");
+            if (this.batteryVoltages.getData().size()==1) this.batteryVoltages.getData().add(this.displayedSeries2);
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][6]));
+                        i++;                        
+                    }
+                    series.setName("MAX");                  
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][7]));
+                        i++;
+                    }
+                    series.setName("MIN");
+                }else if(seriesCount>1)     {
+                    System.out.println("Too many series!");
+                }
+                seriesCount++;
+            }
+        }));
+        tl.setCycleCount(1);
+        tl.play();
     }
     
     @FXML
     private void handleSystemCurrentsSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);
-        this.batteryVoltages.getData().addAll(this.chargeMaxCurrentSeries, this.loadMaxCurrentSeries);
-        this.batteryVoltages.setTitle("Maximum Currents In and Out");        
-        this.yAxis.setLabel("Amps");
-        this.xAxis.setLabel("Date");
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;
+            this.batteryVoltages.setTitle("Max Charge Current and Max Load Current");        
+            this.yAxis.setLabel("A");
+            if (this.batteryVoltages.getData().size()==1) this.batteryVoltages.getData().add(this.displayedSeries2);
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][8]));
+                        i++;                        
+                    }
+                    series.setName("Charge");                  
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][9]));
+                        i++;
+                    }
+                    series.setName("Load");
+                }else if(seriesCount>1)     {
+                    System.out.println("Too many series!");
+                }
+                seriesCount++;
+            }
+        }));
+        tl.setCycleCount(1);
+        tl.play();
     }
     
     @FXML
     private void handleSOCSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);
-        this.batteryVoltages.getData().addAll(this.morningSOCSeries);
-        this.batteryVoltages.setTitle("State of Charge Measured Shortly After Dawn");        
-        this.yAxis.setLabel("Percent %");
-        this.xAxis.setLabel("Date");
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;            
+            this.batteryVoltages.setTitle("State of Charge Percentage");        
+            this.yAxis.setLabel("%");       
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][10].replaceAll("%", "")));
+                        i++;                        
+                    }
+                    series.setName("SOC");                  
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(0);
+                        i++;                        
+                    }
+                }else if(seriesCount>1)     {
+                    System.out.println("Too many series!");
+                }
+                seriesCount++;
+            }
+            this.batteryVoltages.getData().remove(this.displayedSeries2.getData());
+        }));        
+        tl.setCycleCount(1);
+        tl.play();
     }
     
     @FXML
     private void handleTemperatureSelect(ActionEvent event) throws InterruptedException {
-        this.batteryVoltages.getData().remove(0,2);
-        Thread.sleep(3000);
-        this.batteryVoltages.getData().addAll(this.pVMinSeries, this.pVMinSeries);
-        this.batteryVoltages.setTitle("Temperature Measured with External Sensor");        
-        this.yAxis.setLabel("°C");
-        this.xAxis.setLabel("Date");
+        final String[][] dayData = this.solidDecryptor.getDayDecoded();
+        final String[][] monthData = this.solidDecryptor.getMonthDecoded();
+        Timeline tl = new Timeline();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), (ActionEvent actionEvent) -> {
+            int i=0;
+            int seriesCount=0;
+            this.batteryVoltages.setTitle("External Temperature Max and Min Degrees Celsius");        
+            this.yAxis.setLabel("°C");
+            if (this.batteryVoltages.getData().size()==1) this.batteryVoltages.getData().add(this.displayedSeries2);
+            for (XYChart.Series<String, Number> series : this.batteryVoltages.getData()) {
+                if(seriesCount==0) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][11].replaceAll("°C", "")));
+                        i++;                        
+                    }
+                    series.setName("MAX");                    
+                }else if(seriesCount==1) {
+                    i=0;
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        data.setYValue(Float.parseFloat(dayData[i][12].replaceAll("°C", "")));
+                        i++;
+                    }
+                    series.setName("MIN");
+                }else if(seriesCount>1)     {
+                    System.out.println("Too many series!");
+                }
+                
+                seriesCount++;
+            }
+            
+        }));
+        tl.setCycleCount(1);
+        tl.play();
     }
     
     @FXML
@@ -299,6 +474,17 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
         this.solidDecryptor.decryptCurrentValues();
         this.solidDecryptor.decryptDataLogger();
         
+        //Load the Current Values
+        this.currentBatteryVoltage.setText(String.valueOf(this.solidDecryptor.getBatteryVoltage()));
+        this.currentStateOfCharge.setText(String.valueOf(this.solidDecryptor.getSOCPercent()));
+        this.currentChargeCurrent.setText(String.valueOf(this.solidDecryptor.getChargeCurrent()));
+        this.currentLoadCurrent.setText(String.valueOf(this.solidDecryptor.getLoadCurrent()));
+//        this.currentTodaysEnergy.setText(String.valueOf(this.solidDecryptor.ge));
+//        this.currentBatteryChargingState.setText(String.valueOf(this.solidDecryptor.getBatteryChargingState));
+        this.currentLoadState.setText(String.valueOf(this.solidDecryptor.getLoadState()));
+        this.currentTemperature.setText(String.valueOf(this.solidDecryptor.getExternalTemp()));
+       
+        
         //Load the DataLogger Charts
         int i;
         int j;
@@ -308,10 +494,13 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
            if (!dayData[i][0].equals("200-0-0"))    {
                 this.batteryMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][2])));
                 this.batteryMaxSeries.setName("Max");
+                System.out.println(dayData[i][0]+Float.parseFloat(dayData[i][2]));
                 this.batteryMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][3])));
                 this.batteryMinSeries.setName("Min");
+                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][3]));
                 this.chargeAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][4])));
                 this.chargeAmpHoursSeries.setName("Charging");
+                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][4]));
                 this.loadAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][5])));
                 this.loadAmpHoursSeries.setName("Discharging");
                 this.pVMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][6])));
@@ -330,9 +519,10 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
                 this.minExternalTempSeries.setName("Min");
             }
         }
-        //Still need to convert monthData
-        this.batteryVoltages = new BarChart<>(this.xAxis,this.yAxis);
-        this.batteryVoltages.getData().addAll(this.batteryMinSeries, this.batteryMaxSeries);
+        //Still need to convert monthData        
+        this.displayedSeries1.setData(this.batteryMaxSeries.getData());
+        this.displayedSeries2.setData(this.batteryMinSeries.getData());
+        this.batteryVoltages.getData().addAll(this.displayedSeries1, this.displayedSeries2);
         this.batteryVoltages.setTitle("Battery Voltages");        
         this.yAxis.setLabel("Volts");
         this.yAxis.setAnimated(true);

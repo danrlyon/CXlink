@@ -159,157 +159,29 @@
                         <Button fx:id="pVVoltageButton" mnemonicParsing="false" onAction="#handlePVVoltageSelect" prefHeight="55.0" prefWidth="130.0" text="PV Voltages" />
                         <Button fx:id="systemCurrentsButton" mnemonicParsing="false" onAction="#handleSystemCurrentsSelect" prefHeight="55.0" prefWidth="130.0" text="System Currents" />
                         <Button fx:id="morningSOCButton" mnemonicParsing="false" onAction="#handleSOCSelect" prefHeight="55.0" prefWidth="130.0" text="Morning SOC" />
-                        <Button fx:id="temperatureButton" mnemonicParsing="false" prefHeight="55.0" prefWidth="130.0" text="Temperature" />
+                        <Button fx:id="temperatureButton" mnemonicParsing="false" onAction="#handleTemperatureSelect" prefHeight="55.0" prefWidth="130.0" text="Temperature" />
                      </children>
                   </VBox>
                </left>
                <center>
                   <StackPane fx:id="barChartStackPane" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <BarChart fx:id="batteryVoltages" focusTraversable="true" title="Battery Voltages" verticalGridLinesVisible="false">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </BarChart>
-                        <BarChart fx:id="ampHours">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </BarChart>
-                        <BarChart fx:id="pVVoltages">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </BarChart>
-                        <BarChart fx:id="systemCurrents">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </BarChart>
-                        <BarChart fx:id="morningSOC">
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart fx:id="controllerState">
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
-                        <BarChart>
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </BarChart>
+                        <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <BarChart fx:id="batteryVoltages" focusTraversable="true" title="Battery Voltages" verticalGridLinesVisible="false">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
                      </children>
                   </StackPane>
                </center>

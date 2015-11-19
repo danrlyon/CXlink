@@ -96,14 +96,6 @@ public class CXNsolidDataDecryptor {
             }
             i++;
         }
-    }        
-    
-    public String getCurrentValues()  {
-        return this.cxCurrentValues;
-    }
-    
-    public String getDataLogger()   {
-        return this.cxDataLogger;
     }
     
     public int numberLVDDays(){return this.numberLVDDays;}//Number of days with LVD (2bytes)
@@ -124,24 +116,34 @@ public class CXNsolidDataDecryptor {
     public String[][] getMonthDecoded(){return this.monthDecoded;}
     
     /*Current Values information*/
-    public int getLoadCurrentDigits(){return this.loadCurrentDigits;}              // Load current in digits ?what does in digits mean?
-    public float getLoadCurrent(){return this.loadCurrent;}                    // Load current in 10mA
-    public int getChargeCurrentDigits(){return this.chargeCurrentDigits;}            // Charge current in digits
-    public float chargeCurrent(){return this.chargeCurrent;}                  // Charge current in 10mA
-    public int internalTempDigits(){return this.internalTempDigits;}             // Internal temperature in digits
-    public int batteryVoltageDigits(){return this.batteryVoltageDigits;}           // Battery voltage in digits (with current) ?huh?
-    public int firmwareVersion(){return this.firmwareVersion;}                // Firmware version
-    public int loadState(){return this.loadState;}                      // Load state, TBD
-    public int inverterState(){return this.inverterState;}                  // Inverter state
-    public int chargeState(){return this.chargeState;}                    // Charge state
-    public int externalTempError(){return this.externalTempError;}              // External temperature error: 16 ?huh?
-    public float batteryVoltage(){return this.batteryVoltage;}                 // Battery voltage in mV
-    public float endOfChargeVoltage(){return this.endOfChargeVoltage;}             // End of charge voltage in mV
-    public int socPercent(){return this.socPercent;}                     // State of charge percentage
-    public int internalTemp(){return this.internalTemp;}                   // Internal temperature °C
-    public int externalTemp(){return this.externalTemp;}                   // External temperature °C
-    public float pwm(){return this.pwm;}                            // 0 to 7812. Divide by 7812 to get duty cycle
-    public int minutesSinceReset(){return this.minutesSinceReset;}
+    public int getLoadCurrentDigits(){return this.loadCurrentDigits;}
+    public float getLoadCurrent(){return this.loadCurrent;}                    
+    public int getChargeCurrentDigits(){return this.chargeCurrentDigits;}            
+    public float getChargeCurrent(){return this.chargeCurrent;}                 
+    public int getInternalTempDigits(){return this.internalTempDigits;}             
+    public int getBatteryVoltageDigits(){return this.batteryVoltageDigits;}           
+    public int getFirmwareVersion(){return this.firmwareVersion;}                
+    public int getLoadState(){return this.loadState;}                      
+    public int getInverterState(){return this.inverterState;}                 
+    public int getChargeState(){return this.chargeState;}                   
+    public int getExternalTempError(){return this.externalTempError;}              
+    public float getBatteryVoltage(){return this.batteryVoltage;}                 
+    public float getEndOfChargeVoltage(){return this.endOfChargeVoltage;}             
+    public int getSOCPercent(){return this.socPercent;}                     
+    public int getInternalTemp(){return this.internalTemp;}                   
+    public int getExternalTemp(){return this.externalTemp;}                   
+    public float getPWM(){return this.pwm;}                            
+    public int getMinutesSinceReset(){return this.minutesSinceReset;}
+    
+    public String getCurrentValues()  {
+        return this.cxCurrentValues;
+    }
+    
+    public String getDataLogger()   {
+        return this.cxDataLogger;
+    }
+    
+    
 
     //Variables to store settings
 //    public int lvdVoltageDependentDC(){;}
