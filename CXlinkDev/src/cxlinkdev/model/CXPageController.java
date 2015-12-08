@@ -198,11 +198,7 @@ public class CXPageController implements Initializable, ControlledScreen {
         //this.currentValuesBorderPane.setOpacity(1);
         this.dataLoggerBorderPane.setOpacity(0);
         this.newSettingsBorderPane.setOpacity(0);
-        try {
-            this.cxCom = new CXCom();
-        } catch (SerialPortException ex) {
-            Logger.getLogger(CXPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         
         
     }
@@ -256,7 +252,7 @@ public class CXPageController implements Initializable, ControlledScreen {
         //this.refreshCurrentValues(event);
     }
     
-    
+    @FXML
     private void refreshCurrentValues(ActionEvent event) throws SerialPortException, UnsupportedEncodingException {
         
         float batteryVoltage;
@@ -274,59 +270,55 @@ public class CXPageController implements Initializable, ControlledScreen {
         String[][] dayData = new String[31][15];
         String[][] monthData = new String[24][15];
         
-        this.solidDecryptor = new CXNsolidDataDecryptor();  
-        this.solidDecryptor.decryptCurrentValues();
-        this.solidDecryptor.decryptDataLogger();
+        this.cxDecryptor = new CXDataDecryptor();  
+        this.cxDecryptor.decryptCurrentValues();
+        this.cxDecryptor.decryptDataLogger();
         
         //Load the Current Values
-        this.currentBatteryVoltage.setText(String.valueOf(this.solidDecryptor.getBatteryVoltage()));
-        this.currentStateOfCharge.setText(String.valueOf(this.solidDecryptor.getSOCPercent()));
-        this.currentChargeCurrent.setText(String.valueOf(this.solidDecryptor.getChargeCurrent()));
-        this.currentLoadCurrent.setText(String.valueOf(this.solidDecryptor.getLoadCurrent()));
-//        this.currentTodaysEnergy.setText(String.valueOf(this.solidDecryptor.ge));
-//        this.currentBatteryChargingState.setText(String.valueOf(this.solidDecryptor.getBatteryChargingState));
-        this.currentLoadState.setText(String.valueOf(this.solidDecryptor.getLoadState()));
-        this.currentTemperature.setText(String.valueOf(this.solidDecryptor.getExternalTemp()));
+        this.currentBatteryVoltage.setText(String.valueOf(this.cxDecryptor.getBatteryVoltage()));
+        this.currentStateOfCharge.setText(String.valueOf(this.cxDecryptor.getSOCPercent()));
+        this.currentChargeCurrent.setText(String.valueOf(this.cxDecryptor.getPVCurrent()));
+        this.currentLoadCurrent.setText(String.valueOf(this.cxDecryptor.getLoadCurrent()));
+//        this.currentTodaysEnergy.setText(String.valueOf(this.cxDecryptor.ge));
+//        this.currentBatteryChargingState.setText(String.valueOf(this.cxDecryptor.getBatteryChargingState));
+//        this.currentLoadState.setText(String.valueOf(this.cxDecryptor.getLoadState()));
+        this.currentTemperature.setText(String.valueOf(this.cxDecryptor.getExternalTemp()));
        
         
         //Load the DataLogger Charts
         int i;
         int j;
-        dayData = this.solidDecryptor.getDayDecoded();
-        monthData = this.solidDecryptor.getMonthDecoded();
-        for (i=0;i<31;i++)  {
-           if (!dayData[i][0].equals("200-0-0")&&!dayData[i][0].equals("200-1-1"))    {
-                this.batteryMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][2])));
-                this.batteryMaxSeries.setName("Max");
-                System.out.println(dayData[i][0]+Float.parseFloat(dayData[i][2]));
-                this.batteryMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][3])));
-                this.batteryMinSeries.setName("Min");
-                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][3]));
-                this.chargeAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][4])));
-                this.chargeAmpHoursSeries.setName("Charging");
-                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][4]));
-                this.loadAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][5])));
-                this.loadAmpHoursSeries.setName("Discharging");
-                this.pVMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][6])));
-                this.pVMaxSeries.setName("Max");
-                this.pVMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][7])));
-                this.pVMinSeries.setName("Min");
-                this.maxLoadCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][8])));
-                this.maxLoadCurrentSeries.setName("Discharge");
-                this.maxChargeCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][9])));
-                this.maxChargeCurrentSeries.setName("Charge");
-                this.morningSOCSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][10].replace("%", ""))));
-                this.morningSOCSeries.setName("State of Charge");
-                this.maxExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][11].replace("°C",""))));
-                this.maxExternalTempSeries.setName("Max");
-                this.minExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][12].replace("°C",""))));
-                this.minExternalTempSeries.setName("Min");
-            }            
-        } 
-
-    @FXML
-    private void loadSystemReadings()   {
-        
+        dayData = this.cxDecryptor.getDayDecoded();
+        monthData = this.cxDecryptor.getMonthDecoded();
+//        for (i=0;i<31;i++)  {
+//           if (!dayData[i][0].equals("200-0-0")&&!dayData[i][0].equals("200-1-1"))    {
+//                this.batteryMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][2])));
+//                this.batteryMaxSeries.setName("Max");
+//                System.out.println(dayData[i][0]+Float.parseFloat(dayData[i][2]));
+//                this.batteryMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][3])));
+//                this.batteryMinSeries.setName("Min");
+//                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][3]));
+//                this.chargeAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][4])));
+//                this.chargeAmpHoursSeries.setName("Charging");
+//                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][4]));
+//                this.loadAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][5])));
+//                this.loadAmpHoursSeries.setName("Discharging");
+//                this.pVMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][6])));
+//                this.pVMaxSeries.setName("Max");
+//                this.pVMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][7])));
+//                this.pVMinSeries.setName("Min");
+//                this.maxLoadCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][8])));
+//                this.maxLoadCurrentSeries.setName("Discharge");
+//                this.maxChargeCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][9])));
+//                this.maxChargeCurrentSeries.setName("Charge");
+////                this.morningSOCSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][10].replace("%", ""))));
+////                this.morningSOCSeries.setName("State of Charge");
+////                this.maxExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][11].replace("°C",""))));
+////                this.maxExternalTempSeries.setName("Max");
+////                this.minExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][12].replace("°C",""))));
+////                this.minExternalTempSeries.setName("Min");
+//            }            
+//        }     
     }
         
     @FXML
@@ -362,6 +354,36 @@ public class CXPageController implements Initializable, ControlledScreen {
         this.dataLoggerBorderPane.setOpacity(1);
         this.cxPageStackPane.getChildren().remove(0, 2);
         this.cxPageStackPane.getChildren().setAll(this.currentValuesBorderPane, this.newSettingsBorderPane, this.dataLoggerBorderPane);
+        
+    }
+    
+    @FXML
+    private void handleBatteryVoltageSelect(ActionEvent event)   {
+        
+    }
+    
+    @FXML
+    private void handleAmpHourSelect(ActionEvent event)   {
+        
+    }
+    
+    @FXML
+    private void handlePVVoltageSelect(ActionEvent event)   {
+        
+    }
+    
+    @FXML
+    private void handleSystemCurrentsSelect(ActionEvent event)  {
+        
+    }
+    
+    @FXML
+    private void handleTemperatureSelect(ActionEvent event) throws InterruptedException {
+        
+    }
+    
+    @FXML
+    private void handleSOCSelect(ActionEvent event) throws InterruptedException {
         
     }
     

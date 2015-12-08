@@ -269,7 +269,17 @@ public class IntroPageController implements Initializable, ControlledScreen {
     
     @FXML
     private void handleCXConnectSelect(ActionEvent event) throws IOException, SerialPortException {
-        myController.setScreen(CXlinkDev.screen2ID);               
+        switch (controllerType) {
+            case "CXNsolid":
+                myController.setScreen(CXlinkDev.screen4ID);
+                break;
+            case "CXN":
+                myController.setScreen(CXlinkDev.screen3ID);
+                break;
+            case "CX":
+                myController.setScreen(CXlinkDev.screen2ID);
+                break;
+        }
     }
     
     

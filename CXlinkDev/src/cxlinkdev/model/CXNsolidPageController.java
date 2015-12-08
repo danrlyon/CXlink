@@ -534,35 +534,35 @@ public class CXNsolidPageController implements Initializable, ControlledScreen {
                 this.minExternalTempSeries.setName("Min");
             }            
         }
-        for (i=0;i<24;i++)  {
-           if (!monthData[i][0].equals("200-0-0")&&!monthData[i][0].equals("200-1-1"))    {
-                this.batteryMaxMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][2])));
-                this.batteryMaxMonthSeries.setName("Max");
-                System.out.println(monthData[i][0]+Float.parseFloat(monthData[i][2]));
-                this.batteryMinMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][3])));
-                this.batteryMinMonthSeries.setName("Min");
-                System.out.println(monthData[i][0]+ Float.parseFloat(monthData[i][3]));
-                this.chargeAmpHoursMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][4])));
-                this.chargeAmpHoursMonthSeries.setName("Charging");
-                System.out.println(monthData[i][0]+ Float.parseFloat(monthData[i][4]));
-                this.loadAmpHoursMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][5])));
-                this.loadAmpHoursMonthSeries.setName("Discharging");
-                this.pVMaxMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][6])));
-                this.pVMaxMonthSeries.setName("Max");
-                this.pVMinMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][7])));
-                this.pVMinMonthSeries.setName("Min");
-                this.maxLoadCurrentMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][8])));
-                this.maxLoadCurrentMonthSeries.setName("Discharge");
-                this.maxChargeCurrentMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][9])));
-                this.maxChargeCurrentMonthSeries.setName("Charge");
-                this.morningSOCMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][10].replace("%", ""))));
-                this.morningSOCMonthSeries.setName("State of Charge");
-                this.maxExternalTempMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][11].replace("°C",""))));
-                this.maxExternalTempMonthSeries.setName("Max");
-                this.minExternalTempMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][12].replace("°C",""))));
-                this.minExternalTempMonthSeries.setName("Min");
-            }
-        }
+//        for (i=0;i<24;i++)  {
+//           if (!monthData[i][0].equals("200-0-0")&&!monthData[i][0].equals("200-1-1"))    {
+//                this.batteryMaxMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][2])));
+//                this.batteryMaxMonthSeries.setName("Max");
+//                System.out.println(monthData[i][0]+Float.parseFloat(monthData[i][2]));
+//                this.batteryMinMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][3])));
+//                this.batteryMinMonthSeries.setName("Min");
+//                System.out.println(monthData[i][0]+ Float.parseFloat(monthData[i][3]));
+//                this.chargeAmpHoursMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][4])));
+//                this.chargeAmpHoursMonthSeries.setName("Charging");
+//                System.out.println(monthData[i][0]+ Float.parseFloat(monthData[i][4]));
+//                this.loadAmpHoursMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][5])));
+//                this.loadAmpHoursMonthSeries.setName("Discharging");
+//                this.pVMaxMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][6])));
+//                this.pVMaxMonthSeries.setName("Max");
+//                this.pVMinMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][7])));
+//                this.pVMinMonthSeries.setName("Min");
+//                this.maxLoadCurrentMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][8])));
+//                this.maxLoadCurrentMonthSeries.setName("Discharge");
+//                this.maxChargeCurrentMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][9])));
+//                this.maxChargeCurrentMonthSeries.setName("Charge");
+//                this.morningSOCMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][10].replace("%", ""))));
+//                this.morningSOCMonthSeries.setName("State of Charge");
+//                this.maxExternalTempMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][11].replace("°C",""))));
+//                this.maxExternalTempMonthSeries.setName("Max");
+//                this.minExternalTempMonthSeries.getData().add(new XYChart.Data<>(monthData[i][0], Float.parseFloat(monthData[i][12].replace("°C",""))));
+//                this.minExternalTempMonthSeries.setName("Min");
+//            }
+//        }
         //Still need to convert monthData        
         this.displayedSeries1.setData(this.batteryMaxSeries.getData());
         this.displayedSeries2.setData(this.batteryMinSeries.getData());

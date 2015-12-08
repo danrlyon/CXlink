@@ -151,43 +151,40 @@
                   </HBox>
                </top>
                <left>
-                  <Pane prefHeight="395.0" prefWidth="55.0" BorderPane.alignment="CENTER" />
+                  <VBox prefHeight="390.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label prefHeight="60.0" prefWidth="100.0" text="Select Dataset" textAlignment="CENTER" wrapText="true" />
+                        <Button fx:id="batteryVoltageButton" mnemonicParsing="false" onAction="#handleBatteryVoltageSelect" prefHeight="55.0" prefWidth="100.0" text="Battery Voltage" />
+                        <Button fx:id="ampHoursButton" mnemonicParsing="false" onAction="#handleAmpHourSelect" prefHeight="55.0" prefWidth="130.0" text="Amp Hours" />
+                        <Button fx:id="pVVoltageButton" mnemonicParsing="false" onAction="#handlePVVoltageSelect" prefHeight="55.0" prefWidth="130.0" text="PV Voltages" />
+                        <Button fx:id="systemCurrentsButton" mnemonicParsing="false" onAction="#handleSystemCurrentsSelect" prefHeight="55.0" prefWidth="130.0" text="System Currents" />
+                        <Button fx:id="morningSOCButton" mnemonicParsing="false" onAction="#handleSOCSelect" prefHeight="55.0" prefWidth="130.0" text="Morning SOC" />
+                        <Button fx:id="temperatureButton" mnemonicParsing="false" onAction="#handleTemperatureSelect" prefHeight="55.0" prefWidth="130.0" text="Temperature" />
+                     </children>
+                  </VBox>
                </left>
                <center>
-                  <LineChart title="System Values" BorderPane.alignment="CENTER">
-                    <xAxis>
-                      <CategoryAxis side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" />
-                    </yAxis>
-                  </LineChart>
-               </center>
-               <bottom>
-                  <GridPane BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
+                  <StackPane fx:id="barChartStackPane" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <RadioButton mnemonicParsing="false" text="RadioButton" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.rowIndex="1" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.rowIndex="2" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <RadioButton mnemonicParsing="false" text="RadioButton" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <BarChart fx:id="batteryVoltages" focusTraversable="true" title="Battery Voltages" verticalGridLinesVisible="false">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
                      </children>
-                  </GridPane>
-               </bottom>
+                  </StackPane>
+               </center>
             </BorderPane>
             <BorderPane fx:id="currentValuesBorderPane" prefHeight="450.0" prefWidth="720.0">
                <center>

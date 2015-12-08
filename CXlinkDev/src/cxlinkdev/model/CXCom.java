@@ -68,6 +68,7 @@ public final class CXCom {
         serialPort = new SerialPort(selectedPort);
         cxDataLogger = "";
         try {
+            if (serialPort.isOpened()) serialPort.closePort();
             serialPort.openPort();//Open port
             serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
             int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
@@ -88,7 +89,7 @@ public final class CXCom {
                         i++;
                     }   break;
                 case "CX":
-                    while ( cxDataLogger.length()<769 && i<100 )    {
+                    while ( cxDataLogger.length()<769 && i<500 )    {
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException ex) {
@@ -97,7 +98,7 @@ public final class CXCom {
                         i++;        
                     }   break;
                 case "CXN":
-                    while ( cxDataLogger.length()<769 && i<100 )    {
+                    while ( cxDataLogger.length()<769 && i<500 )    {
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException ex) {
@@ -122,6 +123,7 @@ public final class CXCom {
         serialPort = new SerialPort(selectedPort);
         cxCurrentStatus = null;
         try {
+            if ( serialPort.isOpened() ) serialPort.closePort();
             serialPort.openPort();//Open port
             serialPort.setParams(baudrate, 8, 1, 0) ;  //Set Params
             int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
@@ -137,6 +139,7 @@ public final class CXCom {
                 }
                 i++;
             }
+            if ( serialPort.isOpened() ) serialPort.closePort();
         }
         catch (SerialPortException ex) {
             System.out.println(ex);
