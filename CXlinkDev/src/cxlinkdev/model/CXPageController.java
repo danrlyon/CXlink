@@ -24,6 +24,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -112,12 +117,78 @@ public class CXPageController implements Initializable, ControlledScreen {
     final static byte eight = (byte) 0b10000000;
     
     ScreensController myController;
+    private CXDataDecryptor cxDecryptor;
 
     /**
      * Initializes the controller class.
      * @param url
      * @param rb
      */
+    
+    /*List of Line Charts by fx:id*/
+    @FXML private LineChart lineChart;
+    @FXML private final BarChart<String, Number> batteryVoltages;
+    @FXML private final BarChart ampHours;
+    @FXML private final BarChart pVVoltages;
+    @FXML private final BarChart systemCurrents;
+    @FXML private final BarChart morningSOC;
+    @FXML private BarChart externalTemp;
+    
+    //List of the series' needed for the charts
+    private final XYChart.Series displayedSeries1 = new XYChart.Series();
+    private final XYChart.Series displayedSeries2 = new XYChart.Series();
+    private final XYChart.Series batteryMinSeries = new XYChart.Series();
+    private final XYChart.Series batteryMaxSeries = new XYChart.Series();
+    private final XYChart.Series loadAmpHoursSeries = new XYChart.Series();
+    private final XYChart.Series chargeAmpHoursSeries = new XYChart.Series();
+    private final XYChart.Series pVMinSeries = new XYChart.Series();
+    private final XYChart.Series pVMaxSeries = new XYChart.Series();
+    private final XYChart.Series loadMaxCurrentSeries = new XYChart.Series();
+    private final XYChart.Series chargeMaxCurrentSeries = new XYChart.Series();
+    private final XYChart.Series morningSOCSeries = new XYChart.Series();
+    private final XYChart.Series minExternalTempSeries = new XYChart.Series();
+    private final XYChart.Series maxExternalTempSeries = new XYChart.Series();
+    private final XYChart.Series maxLoadCurrentSeries = new XYChart.Series();
+    private final XYChart.Series maxChargeCurrentSeries = new XYChart.Series();
+    private final XYChart.Series displayedMonthSeries1 = new XYChart.Series();
+    private final XYChart.Series displayedMonthSeries2 = new XYChart.Series();
+    private final XYChart.Series batteryMinMonthSeries = new XYChart.Series();
+    private final XYChart.Series batteryMaxMonthSeries = new XYChart.Series();
+    private final XYChart.Series loadAmpHoursMonthSeries = new XYChart.Series();
+    private final XYChart.Series chargeAmpHoursMonthSeries = new XYChart.Series();
+    private final XYChart.Series pVMinMonthSeries = new XYChart.Series();
+    private final XYChart.Series pVMaxMonthSeries = new XYChart.Series();
+    private final XYChart.Series loadMaxCurrentMonthSeries = new XYChart.Series();
+    private final XYChart.Series chargeMaxCurrentMonthSeries = new XYChart.Series();
+    private final XYChart.Series morningSOCMonthSeries = new XYChart.Series();
+    private final XYChart.Series minExternalTempMonthSeries = new XYChart.Series();
+    private final XYChart.Series maxExternalTempMonthSeries = new XYChart.Series();
+    private final XYChart.Series maxLoadCurrentMonthSeries = new XYChart.Series();
+    private final XYChart.Series maxChargeCurrentMonthSeries = new XYChart.Series();
+    
+    private final CategoryAxis xAxis = new CategoryAxis();
+    private final NumberAxis yAxis = new NumberAxis();
+
+    public CXPageController() {        
+        
+        //Set up all of the charts
+        
+        this.ampHours = new BarChart<>(xAxis,yAxis);
+        this.pVVoltages = new BarChart<>(xAxis,yAxis);
+        this.systemCurrents = new BarChart<>(xAxis,yAxis);
+        this.morningSOC = new BarChart<>(xAxis,yAxis);
+        this.externalTemp = new BarChart<>(xAxis,yAxis);
+        this.batteryVoltages = new BarChart<String, Number>(xAxis,yAxis);
+//        this.batteryVoltages.addEventHandler(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent e) {
+//                System.out.println("Action Event BarChart!");
+//            }
+//        });
+        this.xAxis.setLabel("Date");
+        System.out.println("initialized CX page controller");
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
@@ -186,74 +257,72 @@ public class CXPageController implements Initializable, ControlledScreen {
     }
     
     
-    @FXML
     private void refreshCurrentValues(ActionEvent event) throws SerialPortException, UnsupportedEncodingException {
         
-//        float batteryVoltage;
-//        int stateOfCharge = 0;
-//        int chargeCurrent = 0;
-//        int loadCurrent = 0;
-//        int todaysEnergy = 0;
-//        int batteryChargingState = 0;
-//        byte batteryChargingStateByte = (byte) 0b00000000;
-//        String batteryChargingStateString;
-//        int loadState = 0;
-//        int temperature = 0;
-//        String menuState;
-//        byte menuStateByte = (byte) 0b111111111;
-//        
-//        
-//        this.cxCom.setStatus(1);
-//       
-//        //this.cxCom.printStatusCX(space,cxCom.getPortName());        
-//       // this.cxCurrentValues = this.cxCom.getCXCurrentValues(cxCom.getPortName());
-//        //this.cxDataLogger = this.cxCom.getCXDataLoggerValues("!", this.cxCom.getPortName());
-//        //System.out.println(this.cxCom.getDataLoggerValues());
-//        
-//        //Set the TextFields to the most current data
-//        //Set current battery voltage
-//        batteryVoltage = (Float.parseFloat(this.cxCurrentValues.substring(13, 16)));
-//        batteryVoltage = (float) ((batteryVoltage*0.032)+9);
-//        this.currentBatteryVoltage.setText(Float.toString(batteryVoltage));
-//        
-//        //this.currentBatteryVoltage.setText(this.cxCurrentValues.substring(13, 15) +"."+ this.cxCurrentValues.substring(15, 16));
-//        //Set current SOC values, (first MENUSTATE is needed
-//        menuState = (this.cxDataLogger.substring(40,42));
-//        menuStateByte = CXCom.hexStringToByte(menuState);
-////        System.out.println(menuState);
-//        System.out.println(menuStateByte);
-////        System.out.println(menuStateInt[1]);
-//        
-//        if ( "1".equals(this.cxCurrentValues.substring(5,6)) ){
-//            this.currentStateOfCharge.setText(this.cxCurrentValues.substring(5, 8));
-//        } else this.currentStateOfCharge.setText(this.cxCurrentValues.substring(6, 8));
-//        //Set current charge current
-//        if ( "00".equals(this.cxCurrentValues.substring(59, 61)) )  {
-//            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(61, 62));
-//        }else if ( "0".equals(this.cxCurrentValues.substring(59, 60)) ) {
-//            this.currentChargeCurrent.setText(this.cxCurrentValues.substring(60, 62));
-//        }else this.currentChargeCurrent.setText(this.cxCurrentValues.substring(59, 62));
-//        //Set current load current
-//        if ( "00".equals(this.cxCurrentValues.substring(25, 27)) )  {
-//            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(27, 28));
-//        }else if ( "0".equals(this.cxCurrentValues.substring(25, 26)) ) {
-//            this.currentLoadCurrent.setText(this.cxCurrentValues.substring(26, 28));
-//        }else this.currentLoadCurrent.setText(this.cxCurrentValues.substring(25, 28));
-//        //Set current today's energy
-//        this.currentTodaysEnergy.setText("NA");
-//        //Set Battery Charging State
-//        batteryChargingStateString = this.cxCurrentValues.substring(21, 24);
-//        batteryChargingState = (int) Integer.valueOf(batteryChargingStateString);
-//        batteryChargingStateByte = (byte) batteryChargingState;
-//        if ( (batteryChargingState & 1) == 1 ){
-//            this.currentBatteryChargingState.setText("BOOST");
-//        } else if ( (batteryChargingState & 2) == 2 ) {
-//            this.currentBatteryChargingState.setText("EQUALIZE");
-//        } else {
-//            this.currentBatteryChargingState.setText("FLOAT");    
-//        }
-//        
-    } 
+        float batteryVoltage;
+        int stateOfCharge = 0;
+        int chargeCurrent = 0;
+        int loadCurrent = 0;
+        int todaysEnergy = 0;
+        int batteryChargingState = 0;
+        byte batteryChargingStateByte = (byte) 0b00000000;
+        String batteryChargingStateString;
+        int loadState = 0;
+        int temperature = 0;
+        String menuState;
+        byte menuStateByte = (byte) 0b111111111;
+        String[][] dayData = new String[31][15];
+        String[][] monthData = new String[24][15];
+        
+        this.solidDecryptor = new CXNsolidDataDecryptor();  
+        this.solidDecryptor.decryptCurrentValues();
+        this.solidDecryptor.decryptDataLogger();
+        
+        //Load the Current Values
+        this.currentBatteryVoltage.setText(String.valueOf(this.solidDecryptor.getBatteryVoltage()));
+        this.currentStateOfCharge.setText(String.valueOf(this.solidDecryptor.getSOCPercent()));
+        this.currentChargeCurrent.setText(String.valueOf(this.solidDecryptor.getChargeCurrent()));
+        this.currentLoadCurrent.setText(String.valueOf(this.solidDecryptor.getLoadCurrent()));
+//        this.currentTodaysEnergy.setText(String.valueOf(this.solidDecryptor.ge));
+//        this.currentBatteryChargingState.setText(String.valueOf(this.solidDecryptor.getBatteryChargingState));
+        this.currentLoadState.setText(String.valueOf(this.solidDecryptor.getLoadState()));
+        this.currentTemperature.setText(String.valueOf(this.solidDecryptor.getExternalTemp()));
+       
+        
+        //Load the DataLogger Charts
+        int i;
+        int j;
+        dayData = this.solidDecryptor.getDayDecoded();
+        monthData = this.solidDecryptor.getMonthDecoded();
+        for (i=0;i<31;i++)  {
+           if (!dayData[i][0].equals("200-0-0")&&!dayData[i][0].equals("200-1-1"))    {
+                this.batteryMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][2])));
+                this.batteryMaxSeries.setName("Max");
+                System.out.println(dayData[i][0]+Float.parseFloat(dayData[i][2]));
+                this.batteryMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][3])));
+                this.batteryMinSeries.setName("Min");
+                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][3]));
+                this.chargeAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][4])));
+                this.chargeAmpHoursSeries.setName("Charging");
+                System.out.println(dayData[i][0]+ Float.parseFloat(dayData[i][4]));
+                this.loadAmpHoursSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][5])));
+                this.loadAmpHoursSeries.setName("Discharging");
+                this.pVMaxSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][6])));
+                this.pVMaxSeries.setName("Max");
+                this.pVMinSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][7])));
+                this.pVMinSeries.setName("Min");
+                this.maxLoadCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][8])));
+                this.maxLoadCurrentSeries.setName("Discharge");
+                this.maxChargeCurrentSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][9])));
+                this.maxChargeCurrentSeries.setName("Charge");
+                this.morningSOCSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][10].replace("%", ""))));
+                this.morningSOCSeries.setName("State of Charge");
+                this.maxExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][11].replace("°C",""))));
+                this.maxExternalTempSeries.setName("Max");
+                this.minExternalTempSeries.getData().add(new XYChart.Data<>(dayData[i][0], Float.parseFloat(dayData[i][12].replace("°C",""))));
+                this.minExternalTempSeries.setName("Min");
+            }            
+        } 
 
     @FXML
     private void loadSystemReadings()   {

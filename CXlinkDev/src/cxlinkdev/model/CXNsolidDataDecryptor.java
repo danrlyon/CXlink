@@ -271,6 +271,13 @@ public class CXNsolidDataDecryptor {
         for ( i=0;i<24;i++ )    {
             this.monthData[i][0] = Integer.parseInt("0000"+splitDataLogger[733+(i*19)]
                     +splitDataLogger[734+(i*19)], 16);
+            this.currentYear = (byte) (this.dayData[i][0]&127);
+            this.currentMonth = (byte) ((this.dayData[i][0]>>7)&15);
+            this.currentDay = (byte) ((this.dayData[i][0]>>11&31));
+            this.monthDecoded[i][0]= ("20"+Byte.toString(this.currentYear)+"-"
+                    +Byte.toString(this.currentMonth)+"-"
+                    +Byte.toString(this.currentDay));
+            System.out.println(this.monthDecoded[i][0]);
             this.monthData[i][1] = Integer.parseInt("000000"
                     +splitDataLogger[735+(i*19)], 16);
             this.monthData[i][2] = Integer.parseInt("000000"

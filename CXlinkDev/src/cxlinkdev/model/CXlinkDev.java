@@ -59,7 +59,7 @@ public class CXlinkDev extends Application {
         }   catch (FileNotFoundException ex)    {
                 System.out.println("FileNotFoundException caught");
         }            
-        primaryStage.getIcons().add(new Image(cxLinkLogo));
+        if(cxLinkLogo!=null)    primaryStage.getIcons().add(new Image(cxLinkLogo));
         
         //Set the Stage with the IntroPage
         primaryStage.setScene(scene);
